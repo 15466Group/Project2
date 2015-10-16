@@ -9,7 +9,7 @@ public class Grid : MonoBehaviour {
 	private int obstacleLayer;
 	private int goalLayer;
 
-	private Node[,] grid;
+	public Node[,] grid;
 	private int gridWidth;
 	private int gridHeight;
 	private float worldWidth;
@@ -18,7 +18,7 @@ public class Grid : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start () {
+	public void Start () {
 		worldWidth = transform.lossyScale.x * 10.0f; //plane
 		worldHeight = transform.lossyScale.z * 10.0f; //plane
 
@@ -90,11 +90,11 @@ public class Grid : MonoBehaviour {
 	}
 
 	public Vector3 getGridCoords(Vector3 location) {
-		float xDist = location.x - worldNW.x;
-		float zDist = worldNW.z - location.z;
+		float newx = location.x + worldWidth / 2.0f;
+		float newz = -location.z + worldHeight / 2.0f;
 
-		int i = (int)(xDist / nodeSize);
-		int j = (int)(zDist / nodeSize);
+		int i = (int)(newx / nodeSize);
+		int j = (int)(newz / nodeSize);
 
 		return new Vector3(i, 0.0f, j);
 	}

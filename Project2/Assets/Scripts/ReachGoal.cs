@@ -6,9 +6,10 @@ public class ReachGoal: NPCBehaviour {
 
 	public GameObject goal;
 	public GameObject plane;
-	private Grid grid;
+	private Grid G;
+	private Graph graph;
 	private Vector3 endTarget;
-	private List<Vector3> tempPositions;
+	private List<Node> tempPositions;
 
 
 	// Use this for initialization
@@ -18,9 +19,10 @@ public class ReachGoal: NPCBehaviour {
 		acceleration = base.calculateAcceleration (target);
 		isWanderer = false;
 		isReachingGoal = true;
-		grid = plane.GetComponent<Grid> ();
-		tempPositions = new List<Vector3> ();
-		Debug.Log (grid.nodeSize);
+		G = plane.GetComponent<Grid> ();
+		G.Start ();
+		graph = new Graph (G);
+		tempPositions = new List<Node> ();
 	}
 
 	public override void Update () {
@@ -31,10 +33,13 @@ public class ReachGoal: NPCBehaviour {
 
 	Vector3 nextTarget (){
 		Vector3 next = endTarget;
+		tempPositions =  graph.getPath (transform.position, endTarget);
 		if (tempPositions.Count > 0) {
-			next = tempPositions [0];
+			next = tempPositions [0].loc;
+			Debug.Log("asdadsasd");
 			tempPositions.RemoveAt (0);
 		}
+//		Debug.Log("t + " + transform.position + "n + " + next);
 		return next;
 	}
 }

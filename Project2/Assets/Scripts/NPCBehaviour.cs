@@ -161,7 +161,7 @@ public class NPCBehaviour : MonoBehaviour {
 		Vector3 accumulator = new Vector3 ();
 		foreach (Collider obstacle in hits) {
 			if (obstacle.gameObject != this.gameObject && obstacle.gameObject.name != "Ground") {
-				if (!obstacle.gameObject.name.Contains("samuz")){
+				if (!obstacle.gameObject.CompareTag("Character")){
 					weight = obstacleWeight;
 				} else {
 					//the wanderer only moves out of the way for other wanderer's
