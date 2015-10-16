@@ -38,7 +38,11 @@ public class Grid : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-//		updateGrid ();
+		updateGrid ();
+	}
+
+	Node[,] getGrid() {
+		return grid;
 	}
 
 	void updateGrid(){
@@ -50,10 +54,10 @@ public class Grid : MonoBehaviour {
 				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | goalLayer);
 				bool isGoal = checkIfContainsGoal(hits);
 				if(hits.Length == 0) {
-					grid[i,j] = new Node(true, nodeCenter, isGoal);
+					grid[i,j] = new Node(true, nodeCenter, isGoal, i, j);
 				}
 				else {
-					grid[i,j] = new Node(false, nodeCenter, isGoal);
+					grid[i,j] = new Node(false, nodeCenter, isGoal, i, j);
 				}
 			}
 		}
@@ -62,7 +66,7 @@ public class Grid : MonoBehaviour {
 	void OnDrawGizmos() {
 		for (int i = 0; i < gridWidth; i++) {
 			for (int j = 0; j < gridHeight; j ++) {
-				if (!grid [i, j].open) {
+				if (!grid [i, j].free) {
 					Gizmos.color = Color.red;
 					if (grid[i,j].isGoal)
 						Gizmos.color = Color.green;
@@ -74,7 +78,7 @@ public class Grid : MonoBehaviour {
 
 	bool checkIfContainsGoal(Collider[] hits){
 		bool isGoal = false;
-		float epsilon = 20;
+		float epsilon = 0.5f;
 		foreach (Collider hit in hits) {
 			float distance = Vector3.Distance(goal.transform.position, hit.transform.position);
 			if (distance <= epsilon){
@@ -83,6 +87,16 @@ public class Grid : MonoBehaviour {
 			}
 		}
 		return isGoal;
+	}
+
+	public Vector3 getGridCoords(Vector3 location) {
+		float xDist = location.x - worldNW.x;
+		float zDist = worldNW.z - location.z;
+
+		int i = (int)(xDist / nodeSize);
+		int j = (int)(zDist / nodeSize);
+
+		return new Vector3(i, 0.0f, j);
 	}
 
 
