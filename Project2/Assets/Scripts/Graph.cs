@@ -40,20 +40,20 @@ public class Graph : Object {
 		Node startNode = nodes [startI, startJ];
 		Node endNode = nodes [endI, endJ];
 		startNode.g = 0;
-
-//		return getNeighbors (startNode);
+		return getNeighbors (startNode);
 
 		List<Node> open = new List<Node> ();
 		open.Add (startNode);
 
 		Dictionary<Node, Node> dictPath = new Dictionary<Node, Node> ();
 		int c = 0;
-		while (endNode.closed == false) {
+		while (open.Count > 0) {
 //		while (endNode.closed == false && open.Count > 0) {
 			c++;
-//			Debug.Log ("c = " + c);
+			Debug.Log ("c = " + c);
 			Node smallestVal = findSmallestVal(open, end);
-			if (endNode == smallestVal){
+			if (Vector3.Distance(endNode.loc, smallestVal.loc) <= 0.5f){
+				Debug.Log ("bro");
 				return makePath(dictPath, endNode);
 			}
 			open.Remove (smallestVal);
@@ -61,11 +61,12 @@ public class Graph : Object {
 			int d = 0;
 			foreach (Node successor in getNeighbors(smallestVal)){
 				d++;
-//				Debug.Log("d = " + d);
+				Debug.Log("d = " + d);
 				if (successor.closed){
 					continue; //in the closed set
 				}
 				float newCost = smallestVal.g + costOfStep(smallestVal, successor);
+				Debug.Log ("open.Count = " + open.Count + " contains: " + open.Contains(successor));
 				if (!open.Contains(successor)){
 					open.Add (successor);
 					Debug.Log("added to open list");
@@ -92,7 +93,7 @@ public class Graph : Object {
 			path.Add(currentNode);
 		}
 		path.Reverse ();
-		Debug.Log ("path length: " + path.Count);
+//		Debug.Log ("path length: " + path.Count + "dictPathLength: " + dictPath.Count);
 		return path;
 	}
 

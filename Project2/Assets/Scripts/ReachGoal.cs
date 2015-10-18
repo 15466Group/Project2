@@ -10,6 +10,10 @@ public class ReachGoal: NPCBehaviour {
 	private Graph graph;
 	private Vector3 endTarget;
 	private List<Node> tempPositions;
+	private float timer;
+	private float searchTime;
+	private bool hitNextNode;
+	private Vector3 next;
 
 
 	// Use this for initialization
@@ -23,6 +27,10 @@ public class ReachGoal: NPCBehaviour {
 		G.Start ();
 		graph = new Graph (G);
 		tempPositions = new List<Node> ();
+		searchTime = 50.0f;
+		timer = 0.0f;
+		hitNextNode = false;
+		next = transform.position;
 	}
 
 	public override void Update () {
@@ -32,14 +40,21 @@ public class ReachGoal: NPCBehaviour {
 	}
 
 	Vector3 nextTarget (){
-		Vector3 next = endTarget;
-		if (tempPositions.Count > 0) {
+		Vector3 nextCoords = G.getGridCoords (next);
+		Vector3 transCoords = G.getGridCoords (transform.position);
+		if (nextCoords.x == transCoords.x && nextCoords.z == transCoords.z) {
+			hitNextNode = true;
+		}
+		timer += Time.deltaTime;
+		if (timer >= searchTime || tempPositions.Count == 0) {
+			tempPositions =  graph.getPath (transform.position, endTarget);
+			timer = 0.0f;
+		}
+		if (hitNextNode){
 			next = tempPositions [0].loc;
 			Debug.Log (tempPositions.Count + " > 0");
 			tempPositions.RemoveAt (0);
-		} else {
-			tempPositions =  graph.getPath (transform.position, endTarget);
-			Debug.Log ("= 0");
+			hitNextNode = false;
 		}
 //		Debug.Log("t + " + transform.position + "n + " + next);
 		return next;
