@@ -33,11 +33,13 @@ public class ReachGoal: NPCBehaviour {
 
 	Vector3 nextTarget (){
 		Vector3 next = endTarget;
-		tempPositions =  graph.getPath (transform.position, endTarget);
 		if (tempPositions.Count > 0) {
 			next = tempPositions [0].loc;
-			Debug.Log("asdadsasd");
+			Debug.Log (tempPositions.Count + " > 0");
 			tempPositions.RemoveAt (0);
+		} else {
+			tempPositions =  graph.getPath (transform.position, endTarget);
+			Debug.Log ("= 0");
 		}
 //		Debug.Log("t + " + transform.position + "n + " + next);
 		return next;

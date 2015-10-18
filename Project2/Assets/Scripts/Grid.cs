@@ -51,13 +51,14 @@ public class Grid : MonoBehaviour {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
 				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
 				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
-				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | goalLayer);
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer);
 				bool isGoal = checkIfContainsGoal(hits);
+				float h = Vector3.Distance(nodeCenter, goal.transform.position);
 				if(hits.Length == 0) {
-					grid[i,j] = new Node(true, nodeCenter, isGoal, i, j);
+					grid[i,j] = new Node(true, nodeCenter, isGoal, i, j, h);
 				}
 				else {
-					grid[i,j] = new Node(false, nodeCenter, isGoal, i, j);
+					grid[i,j] = new Node(false, nodeCenter, isGoal, i, j, h);
 				}
 			}
 		}

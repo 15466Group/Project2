@@ -10,19 +10,19 @@ public class Node : Object {
 	public int j;
 	public float g;
 	public float h;
-	public bool open;
-	//public bool closed;
+//	public bool open;
+	public bool closed;
 
-	public Node (bool op, Vector3 pos, bool isG, int newi, int newj) {
-		free = op;
+	public Node (bool isFree, Vector3 pos, bool isG, int newi, int newj, float heuristic) {
+		free = isFree;
 		loc = pos;
 		isGoal = isG;
 		i = newi;
 		j = newj;
 		g = Mathf.Infinity;
-		h = Mathf.Infinity;
-		open = true;
-		//closed = false;
+		h = heuristic;
+//		open = true;
+		closed = false;
 	}
 
 }
