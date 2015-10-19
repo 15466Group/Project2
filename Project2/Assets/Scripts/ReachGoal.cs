@@ -27,7 +27,7 @@ public class ReachGoal: NPCBehaviour {
 		G.Start ();
 		graph = new Graph (G);
 		tempPositions = new List<Node> ();
-		searchTime = 50.0f;
+		searchTime = 2.0f;
 		timer = 0.0f;
 		hitNextNode = false;
 		next = transform.position;

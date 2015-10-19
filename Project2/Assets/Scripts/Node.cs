@@ -28,13 +28,6 @@ public class Node : IEquatable<Node> {
 //		closed = false;
 	}
 
-//	public override bool Equals(object obj){
-//		if (obj == null) return false;
-//		Node other = obj as Node;
-//		if (other == null) return false;
-//		return (this.i == other.i && this.j == other.j);
-//	}
-
 	public bool Equals(Node other){
 		if (other == null) return false;
 		return (this.i == other.i && this.j == other.j);

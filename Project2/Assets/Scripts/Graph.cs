@@ -53,6 +53,11 @@ public class Graph : Object {
 		List<Node> closed = new List<Node> ();
 		open.Add (startNode);
 
+		List<Node> failPath = new List<Node> ();
+		failPath.Add (startNode);
+		if (!endNode.free) //choose a closest valid endNode
+			return failPath;
+
 		Dictionary<Node, Node> dictPath = new Dictionary<Node, Node> ();
 		int c = 0;
 		while (open.Count > 0) {
@@ -66,7 +71,7 @@ public class Graph : Object {
 			closed.Add (current);
 			int d = 0;
 			foreach (Node successor in getNeighbors(current)){
-				Debug.DrawLine (successor.loc, current.loc, Color.blue);
+//				Debug.DrawLine (successor.loc, current.loc, Color.blue);
 				d++;
 				Debug.Log("d = " + d);
 				if (closed.Contains (successor)){
@@ -92,7 +97,7 @@ public class Graph : Object {
 			}
 		}
 		//Debug.Log ("endNode.closed = " + endNode.closed + " open.Count = " + open.Count);
-		return makePath(dictPath, endNode);
+		return failPath;
 	}
 
 	List<Node> makePath(Dictionary<Node, Node> dictPath, Node endNode){
@@ -108,6 +113,8 @@ public class Graph : Object {
 			path.Add(currentNode);
 		}
 		path.Reverse ();
+		if (path.Count > 0)
+			path.RemoveAt (0);
 //		Debug.Log ("path length: " + path.Count + "dictPathLength: " + dictPath.Count);
 		return path;
 	}
