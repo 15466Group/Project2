@@ -17,17 +17,6 @@ public class Graph : Object {
 		numCols = nodes.GetLength (1);
 	}
 
-//	// Use this for initialization
-//	void Start () {
-//		numRows = nodes.GetLength (0);
-//		numCols = nodes.GetLength (1);
-//	}
-//	
-//	// Update is called once per frame
-//	void Update () {
-//	
-//	}
-
 	public List<Node> getPath(Vector3 start, Vector3 end) {
 
 		Vector3 startCoords = g.getGridCoords (start);
@@ -42,13 +31,6 @@ public class Graph : Object {
 		startNode.g = 0;
 		startNode.f = startNode.g + startNode.h;
 
-//		List<Node> path = getNeighbors (startNode);
-
-//		dictPath.Add (path [1], path [0]);
-//		dictPath.Add (path [3], path [2]);
-//
-//		return getNeighbors (startNode);
-
 		List<Node> open = new List<Node> ();
 		List<Node> closed = new List<Node> ();
 		open.Add (startNode);
@@ -59,28 +41,21 @@ public class Graph : Object {
 			return failPath;
 
 		Dictionary<Node, Node> dictPath = new Dictionary<Node, Node> ();
-		int c = 0;
 		while (open.Count > 0) {
-			c++;
-			Debug.Log ("c = " + c);
 			Node current = findSmallestVal(open, end);
 			if (Vector3.Distance(endNode.loc, current.loc) <= 0.5f){
 				return makePath(dictPath, endNode);
 			}
 			open.Remove (current);
 			closed.Add (current);
-			int d = 0;
 			foreach (Node successor in getNeighbors(current)){
 //				Debug.DrawLine (successor.loc, current.loc, Color.blue);
-				d++;
-				Debug.Log("d = " + d);
 				if (closed.Contains (successor)){
 					continue; //in the closed set
 				}
 				float newCost = current.g + costOfStep(current, successor);
 				if (!open.Contains(successor)){
 					open.Add (successor);
-					Debug.Log("added to open list");
 				}
 				else if (successor.g <= newCost){
 					continue;
@@ -96,7 +71,6 @@ public class Graph : Object {
 				}
 			}
 		}
-		//Debug.Log ("endNode.closed = " + endNode.closed + " open.Count = " + open.Count);
 		return failPath;
 	}
 
@@ -106,7 +80,6 @@ public class Graph : Object {
 		path.Add (currentNode);
 		Node prevNode = endNode;
 		while (dictPath.ContainsKey(currentNode)) {
-			Debug.Log("dictpath construction");
 			currentNode = dictPath[currentNode];
 			//Debug.DrawLine(prevNode.loc, currentNode.loc, Color.red);
 			prevNode = currentNode;
@@ -115,7 +88,6 @@ public class Graph : Object {
 		path.Reverse ();
 		if (path.Count > 0)
 			path.RemoveAt (0);
-//		Debug.Log ("path length: " + path.Count + "dictPathLength: " + dictPath.Count);
 		return path;
 	}
 

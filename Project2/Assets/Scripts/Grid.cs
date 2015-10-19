@@ -7,7 +7,7 @@ public class Grid : MonoBehaviour {
 	public GameObject goal;
 
 	private int obstacleLayer;
-	private int goalLayer;
+//	private int goalLayer;
 
 	public Node[,] grid;
 	private int gridWidth;
@@ -30,7 +30,7 @@ public class Grid : MonoBehaviour {
 		worldNW = transform.position - (transform.right * worldWidth / 2.0f) + (transform.forward * worldHeight / 2.0f);
 
 		obstacleLayer = 1 << LayerMask.NameToLayer ("Obstacles");
-		goalLayer = 1 << LayerMask.NameToLayer ("Goal");
+//		goalLayer = 1 << LayerMask.NameToLayer ("Goal");
 
 		updateGrid ();
 

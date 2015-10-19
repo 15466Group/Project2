@@ -5,15 +5,16 @@ using System.Collections.Generic;
 public class ReachGoal: NPCBehaviour {
 
 	public GameObject goal;
-	public GameObject plane;
-	private Grid G;
-	private Graph graph;
 	private Vector3 endTarget;
-	private List<Node> tempPositions;
 	private float timer;
 	private float searchTime;
 	private bool hitNextNode;
-	private Vector3 next;
+
+	public List<Node> tempPositions;
+	public Vector3 next;
+	public Vector3 nextCoords;
+	public Vector3 transCoords;
+	public Vector3 endCoords;
 
 
 	// Use this for initialization
@@ -23,17 +24,15 @@ public class ReachGoal: NPCBehaviour {
 		acceleration = base.calculateAcceleration (target);
 		isWanderer = false;
 		isReachingGoal = true;
-		G = plane.GetComponent<Grid> ();
-		G.Start ();
-		graph = new Graph (G);
-		tempPositions = new List<Node> ();
-		searchTime = 2.0f;
-		timer = 0.0f;
 		hitNextNode = false;
 		next = transform.position;
+		nextCoords = next;
+		transCoords = next;
+		endCoords = new Vector3 (next.x + 10.0f, 0.0f, next.z + 10.0f);
+		tempPositions = new List<Node> ();
 	}
 
-	public override void Update () {
+	public void nextStep () {
 		for(int i = 0; i < tempPositions.Count - 1; i++) {
 			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.red);
 		}
@@ -43,25 +42,29 @@ public class ReachGoal: NPCBehaviour {
 	}
 
 	Vector3 nextTarget (){
-		Vector3 nextCoords = G.getGridCoords (next);
-		Vector3 transCoords = G.getGridCoords (transform.position);
-		if (nextCoords.x == transCoords.x && nextCoords.z == transCoords.z) {
+//		Vector3 nextCoords = G.getGridCoords (next);
+//		Vector3 transCoords = G.getGridCoords (transform.position);
+		// grid[.x, .z] == grid[i, j]
+		if (nextCoords.x == transCoords.x && nextCoords.z == transCoords.z && 
+		    (transCoords.x != endCoords.x || transCoords.z != endCoords.z)) {
 			hitNextNode = true;
-		}
-		timer += Time.deltaTime;
-		if (timer >= searchTime || tempPositions.Count == 0) {
-			G.updateGrid ();
-			graph = new Graph(G);
-			tempPositions =  graph.getPath (transform.position, endTarget);
-			timer = 0.0f;
 		}
 		if (hitNextNode){
 			next = tempPositions [0].loc;
-			Debug.Log (tempPositions.Count + " > 0");
 			tempPositions.RemoveAt (0);
 			hitNextNode = false;
 		}
 //		Debug.Log("t + " + transform.position + "n + " + next);
 		return next;
+	}
+
+	public void assignedPath(List<Node> path){
+		tempPositions = path;
+	}
+
+	public void assignGridCoords(Vector3 nxtCrds, Vector3 trnsCrds, Vector3 endCrds){
+		endCoords = endCrds;
+		nextCoords = nxtCrds;
+		transCoords = trnsCrds;
 	}
 }
