@@ -34,6 +34,9 @@ public class ReachGoal: NPCBehaviour {
 	}
 
 	public override void Update () {
+		for(int i = 0; i < tempPositions.Count - 1; i++) {
+			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.red);
+		}
 		endTarget = goal.transform.position;
 		target = nextTarget();
 		base.Update ();
@@ -47,6 +50,8 @@ public class ReachGoal: NPCBehaviour {
 		}
 		timer += Time.deltaTime;
 		if (timer >= searchTime || tempPositions.Count == 0) {
+			G.updateGrid ();
+			graph = new Graph(G);
 			tempPositions =  graph.getPath (transform.position, endTarget);
 			timer = 0.0f;
 		}

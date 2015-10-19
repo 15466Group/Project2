@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
-public class Node : Object {
+public class Node : IEquatable<Node> {
 
-	public bool free;
-	public Vector3 loc;
-	public bool isGoal;
-	public int i;
-	public int j;
-	public float g;
-	public float h;
+	public bool free { get; set;}
+	public Vector3 loc { get; set;}
+	public bool isGoal { get; set;}
+	public int i { get; set;}
+	public int j { get; set;}
+	public float f { get; set;}
+	public float g { get; set;}
+	public float h { get; set;}
 //	public bool open;
-	public bool closed;
+//	public bool closed { get; set;}
 
 	public Node (bool isFree, Vector3 pos, bool isG, int newi, int newj, float heuristic) {
 		free = isFree;
@@ -19,10 +21,23 @@ public class Node : Object {
 		isGoal = isG;
 		i = newi;
 		j = newj;
+		f = Mathf.Infinity;
 		g = Mathf.Infinity;
 		h = heuristic;
 //		open = true;
-		closed = false;
+//		closed = false;
+	}
+
+//	public override bool Equals(object obj){
+//		if (obj == null) return false;
+//		Node other = obj as Node;
+//		if (other == null) return false;
+//		return (this.i == other.i && this.j == other.j);
+//	}
+
+	public bool Equals(Node other){
+		if (other == null) return false;
+		return (this.i == other.i && this.j == other.j);
 	}
 
 }

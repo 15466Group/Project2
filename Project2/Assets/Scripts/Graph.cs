@@ -40,33 +40,39 @@ public class Graph : Object {
 		Node startNode = nodes [startI, startJ];
 		Node endNode = nodes [endI, endJ];
 		startNode.g = 0;
-		return getNeighbors (startNode);
+		startNode.f = startNode.g + startNode.h;
+
+//		List<Node> path = getNeighbors (startNode);
+
+//		dictPath.Add (path [1], path [0]);
+//		dictPath.Add (path [3], path [2]);
+//
+//		return getNeighbors (startNode);
 
 		List<Node> open = new List<Node> ();
+		List<Node> closed = new List<Node> ();
 		open.Add (startNode);
 
 		Dictionary<Node, Node> dictPath = new Dictionary<Node, Node> ();
 		int c = 0;
 		while (open.Count > 0) {
-//		while (endNode.closed == false && open.Count > 0) {
 			c++;
 			Debug.Log ("c = " + c);
-			Node smallestVal = findSmallestVal(open, end);
-			if (Vector3.Distance(endNode.loc, smallestVal.loc) <= 0.5f){
-				Debug.Log ("bro");
+			Node current = findSmallestVal(open, end);
+			if (Vector3.Distance(endNode.loc, current.loc) <= 0.5f){
 				return makePath(dictPath, endNode);
 			}
-			open.Remove (smallestVal);
-			smallestVal.closed = true;
+			open.Remove (current);
+			closed.Add (current);
 			int d = 0;
-			foreach (Node successor in getNeighbors(smallestVal)){
+			foreach (Node successor in getNeighbors(current)){
+				Debug.DrawLine (successor.loc, current.loc, Color.blue);
 				d++;
 				Debug.Log("d = " + d);
-				if (successor.closed){
+				if (closed.Contains (successor)){
 					continue; //in the closed set
 				}
-				float newCost = smallestVal.g + costOfStep(smallestVal, successor);
-				Debug.Log ("open.Count = " + open.Count + " contains: " + open.Contains(successor));
+				float newCost = current.g + costOfStep(current, successor);
 				if (!open.Contains(successor)){
 					open.Add (successor);
 					Debug.Log("added to open list");
@@ -76,10 +82,16 @@ public class Graph : Object {
 				}
 
 				successor.g = newCost;
-				dictPath.Add(successor, smallestVal); //successor came from smallestVal, to reconstruct path backwards
+				successor.f = successor.g + successor.h;
+				if(dictPath.ContainsKey (successor)) {
+					dictPath[successor] = current;
+				}
+				else {
+					dictPath.Add(successor, current); //successor came from smallestVal, to reconstruct path backwards
+				}
 			}
 		}
-		Debug.Log ("endNode.closed = " + endNode.closed + " open.Count = " + open.Count);
+		//Debug.Log ("endNode.closed = " + endNode.closed + " open.Count = " + open.Count);
 		return makePath(dictPath, endNode);
 	}
 
@@ -87,9 +99,12 @@ public class Graph : Object {
 		List<Node> path = new List<Node> ();
 		Node currentNode = endNode;
 		path.Add (currentNode);
+		Node prevNode = endNode;
 		while (dictPath.ContainsKey(currentNode)) {
 			Debug.Log("dictpath construction");
 			currentNode = dictPath[currentNode];
+			//Debug.DrawLine(prevNode.loc, currentNode.loc, Color.red);
+			prevNode = currentNode;
 			path.Add(currentNode);
 		}
 		path.Reverse ();
@@ -99,21 +114,21 @@ public class Graph : Object {
 
 	Node findSmallestVal(List<Node> open, Vector3 end){
 		Node smallestVal = open[0];
-		float min = smallestVal.g + weight * smallestVal.h;
+		//float min = smallestVal.g + weight * smallestVal.h;
+		float min = smallestVal.f;
 		foreach (Node n in open) {
-			float potentialMin = n.g + weight * smallestVal.h;
+			float potentialMin = n.f;
 			if (potentialMin < min){
 				min = potentialMin;
 				smallestVal = n;
 			}
 		}
 		return smallestVal;
-
 	}
 
 	//simple movements only
 	float costOfStep(Node currNode, Node nextNode){
-		return 1.0f;
+		return Vector3.Distance (currNode.loc, nextNode.loc);
 	}
 
 	List<Node> getNeighbors(Node n) {

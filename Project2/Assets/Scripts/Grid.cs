@@ -38,14 +38,14 @@ public class Grid : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		updateGrid ();
+		//updateGrid ();
 	}
 
 	Node[,] getGrid() {
 		return grid;
 	}
 
-	void updateGrid(){
+	public void updateGrid(){
 		for (int i = 0; i < gridWidth; i++) {
 			for (int j = 0; j < gridHeight; j ++) {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
