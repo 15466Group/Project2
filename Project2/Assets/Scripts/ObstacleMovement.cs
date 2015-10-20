@@ -18,18 +18,18 @@ public class ObstacleMovement : MonoBehaviour {
 		movementTime += Time.deltaTime;
 		if (movementTime <= howLong) {
 			if (string.Compare (direction, "X") == 0) {
-				transform.position += transform.right;
+				transform.position += transform.right * 0.5f;
 			}
 			else{
-				transform.position += transform.forward;
+				transform.position += transform.forward * 0.5f;
 			}
 		} else {
 			if (movementTime <= 2*howLong){
 				if (string.Compare (direction, "X") == 0) {
-					transform.position -= transform.right;
+					transform.position -= transform.right * 0.5f;
 				}
 				else{
-					transform.position -= transform.forward;
+					transform.position -= transform.forward * 0.5f;
 				}
 			}
 			else {

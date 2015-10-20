@@ -24,7 +24,7 @@ public class ReachGoal: NPCBehaviour {
 		acceleration = base.calculateAcceleration (target);
 		isWanderer = false;
 		isReachingGoal = true;
-		hitNextNode = false;
+		hitNextNode = true;
 		next = transform.position;
 		nextCoords = next;
 		transCoords = next;
@@ -34,7 +34,7 @@ public class ReachGoal: NPCBehaviour {
 
 	public void nextStep () {
 		for(int i = 0; i < tempPositions.Count - 1; i++) {
-			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.red);
+			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.yellow);
 		}
 		endTarget = goal.transform.position;
 		target = nextTarget();
@@ -49,7 +49,7 @@ public class ReachGoal: NPCBehaviour {
 		    (transCoords.x != endCoords.x || transCoords.z != endCoords.z)) {
 			hitNextNode = true;
 		}
-		if (hitNextNode){
+		if (hitNextNode && tempPositions.Count > 0){
 			next = tempPositions [0].loc;
 			tempPositions.RemoveAt (0);
 			hitNextNode = false;
@@ -60,6 +60,7 @@ public class ReachGoal: NPCBehaviour {
 
 	public void assignedPath(List<Node> path){
 		tempPositions = path;
+		hitNextNode = true;
 	}
 
 	public void assignGridCoords(Vector3 nxtCrds, Vector3 trnsCrds, Vector3 endCrds){

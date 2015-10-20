@@ -110,6 +110,7 @@ public class NPCBehaviour : MonoBehaviour {
 //	void OnDrawGizmos(){
 //		Gizmos.color = Color.magenta;
 //		Gizmos.DrawWireSphere (transform.position, closeRayDist);
+//		Gizmos.DrawWireSphere (transform.position, rayDist);
 //	}
 	
 	//even if something isn't directly in front of the character, should still avoid it if it's too close

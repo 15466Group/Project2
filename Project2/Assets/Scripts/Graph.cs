@@ -29,7 +29,7 @@ public class Graph : Object {
 		Node startNode = nodes [startI, startJ];
 		Node endNode = nodes [endI, endJ];
 		startNode.g = 0;
-		startNode.f = startNode.g + startNode.h;
+		startNode.f = startNode.g + weight * startNode.h;
 
 		List<Node> open = new List<Node> ();
 		List<Node> closed = new List<Node> ();
@@ -62,7 +62,7 @@ public class Graph : Object {
 				}
 
 				successor.g = newCost;
-				successor.f = successor.g + successor.h;
+				successor.f = successor.g + weight * successor.h;
 				if(dictPath.ContainsKey (successor)) {
 					dictPath[successor] = current;
 				}
