@@ -64,18 +64,18 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-	void OnDrawGizmos() {
-		for (int i = 0; i < gridWidth; i++) {
-			for (int j = 0; j < gridHeight; j ++) {
-				if (!grid [i, j].free) {
-					Gizmos.color = Color.red;
-					if (grid[i,j].isGoal)
-						Gizmos.color = Color.green;
-					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
-				}
-			}
-		}
-	}
+//	void OnDrawGizmos() {
+//		for (int i = 0; i < gridWidth; i++) {
+//			for (int j = 0; j < gridHeight; j ++) {
+//				if (!grid [i, j].free) {
+//					Gizmos.color = Color.red;
+//					if (grid[i,j].isGoal)
+//						Gizmos.color = Color.green;
+//					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
+//				}
+//			}
+//		}
+//	}
 
 	bool checkIfContainsGoal(Collider[] hits){
 		bool isGoal = false;

@@ -34,7 +34,7 @@ public class ReachGoal: NPCBehaviour {
 
 	public void nextStep () {
 		for(int i = 0; i < tempPositions.Count - 1; i++) {
-			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.yellow);
+//			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.yellow);
 		}
 		endTarget = goal.transform.position;
 		target = nextTarget();
