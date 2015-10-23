@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Grid : MonoBehaviour {
 
@@ -17,6 +18,9 @@ public class Grid : MonoBehaviour {
 	private Vector3 worldNW; //world north west, top left corner of map/plane
 
 
+	public GameObject staticObj;
+	public GameObject dynamicObj;
+
 	// Use this for initialization
 	public void Start () {
 		worldWidth = transform.lossyScale.x * 10.0f; //plane
@@ -32,6 +36,7 @@ public class Grid : MonoBehaviour {
 		obstacleLayer = 1 << LayerMask.NameToLayer ("Obstacles");
 //		goalLayer = 1 << LayerMask.NameToLayer ("Goal");
 
+		//initializeGrid ();
 		updateGrid ();
 
 	}
@@ -45,6 +50,88 @@ public class Grid : MonoBehaviour {
 		return grid;
 	}
 
+
+//	public void initializeGrid() {
+//
+//		bool isGoal = false;
+//		for (int i = 0; i < gridWidth; i++) {
+//			for(int j = 0; j < gridWidth; j++) {
+//				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
+//				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
+//				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
+//				float h = Vector3.Distance(nodeCenter, goal.transform.position);
+//				grid[i,j] = new Node(true, nodeCenter, isGoal, i, j, h);
+//			}
+//		}
+//
+//		int staticCount = staticObj.transform.childCount;
+//		for (int i = 0; i < staticCount; i++) {
+//			GameObject obj = staticObj.transform.GetChild (i).gameObject;
+//			int[] bounds = getOccupiedBounds (obj);
+//			for (int j = bounds[0]; j < bounds[1]; j++) {
+//				for(int k = bounds[2]; k < bounds[3]; k++) {
+//					float xp = j * nodeSize + (nodeSize/2.0f) + worldNW.x;
+//					float zp = -(k * nodeSize + (nodeSize/2.0f)) + worldNW.z;
+//					Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
+//					Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer);
+//					//bool isGoal = checkIfContainsGoal(hits);
+//					float h = Vector3.Distance(nodeCenter, goal.transform.position);
+//					if(hits.Length == 0) {
+//						grid[j,k] = new Node(true, nodeCenter, isGoal, j, k, h);
+//					}
+//					else {
+//						grid[j,k] = new Node(false, nodeCenter, isGoal, j, k, h);
+//					}
+//				}
+//			}
+//		}
+//	
+//	}
+//
+//	public void updateGrid() {
+//		bool isGoal = false;
+//		int dynamicCount = dynamicObj.transform.childCount;
+//		for (int i = 0; i < dynamicCount; i++) {
+//			GameObject obj = dynamicObj.transform.GetChild (i).gameObject;
+//			int[] bounds = getOccupiedBounds (obj);
+//			for (int j = bounds[0]; j < bounds[1]; j++) {
+//				for(int k = bounds[2]; k < bounds[3]; k++) {
+//					float xp = j * nodeSize + (nodeSize/2.0f) + worldNW.x;
+//					float zp = -(k * nodeSize + (nodeSize/2.0f)) + worldNW.z;
+//					Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
+//					Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer);
+//					//bool isGoal = checkIfContainsGoal(hits);
+//					float h = Vector3.Distance(nodeCenter, goal.transform.position);
+//					if(hits.Length == 0) {
+//						grid[j,k] = new Node(true, nodeCenter, isGoal, j, k, h);
+//					}
+//					else {
+//						grid[j,k] = new Node(false, nodeCenter, isGoal, j, k, h);
+//					}
+//				}
+//			}
+//		}
+//		Vector3 goalGridCoords = getGridCoords (goal.transform.position);
+//		grid [(int) goalGridCoords.x, (int) goalGridCoords.z].isGoal = true;
+//	}
+//
+//	int[] getOccupiedBounds(GameObject thingy) {
+//		//stores the bounds as [minX, maxX, minZ, maxZ]
+//		int[] bounds = new int[4];
+//		Collider col = thingy.GetComponent <Collider>();
+//		Vector3 max = col.bounds.max;
+//		Vector3 min = col.bounds.min;
+//		Vector3 gridCoordMax = getGridCoords (max);
+//		Vector3 gridCoordMin = getGridCoords (min);
+//
+//		bounds [0] = (int) gridCoordMin.x;
+//		bounds [1] = (int) gridCoordMax.x;
+//		bounds [2] = (int) gridCoordMax.z;
+//		bounds [3] = (int) gridCoordMin.z;
+//		return bounds;
+//
+//	}
+	
 	public void updateGrid(){
 		for (int i = 0; i < gridWidth; i++) {
 			for (int j = 0; j < gridHeight; j ++) {
@@ -96,6 +183,15 @@ public class Grid : MonoBehaviour {
 
 		int i = (int)(newx / nodeSize);
 		int j = (int)(newz / nodeSize);
+
+		if (i < 0)
+			i = 0;
+		if (i > gridWidth)
+			i = gridWidth - 1;
+		if (j < 0)
+			j = 0;
+		if (j > gridHeight)
+			j = gridHeight - 1;
 
 		return new Vector3(i, 0.0f, j);
 	}
