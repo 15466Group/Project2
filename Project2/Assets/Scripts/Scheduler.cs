@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Scheduler : MonoBehaviour {
-
-	public GameObject plane;
+	
 	public GameObject goal;
 	public GameObject characters; //empty gameobject containing children of in game characters
 
@@ -32,10 +31,9 @@ public class Scheduler : MonoBehaviour {
 		timer = 0.0f;
 		searchTime = 2.0f;
 
-		G = plane.GetComponent<Grid> ();
-		G.Start ();
+		G = GetComponent<Grid> ();
+		G.initStart ();
 		graph = new Graph (G);
-
 		for (int i = 0; i < numChars; i++) {
 			Transform child = characters.transform.GetChild(i);
 			reachGoal = child.GetComponent<ReachGoal> ();
@@ -64,7 +62,7 @@ public class Scheduler : MonoBehaviour {
 		graph.g.updateGrid ();
 		timer += Time.deltaTime;
 		reachGoal.assignedPath (graph.getPath (start, end));
-		timer = 0.0f;
+//		timer = 0.0f;
 //		if (timer >= searchTime || path.Count == 0) {
 //			reachGoal.assignedPath (graph.getPath (start, end));
 //			timer = 0.0f;

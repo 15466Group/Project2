@@ -8,16 +8,22 @@ public class Graph : Object {
 	public Grid g;
 	private int numRows;
 	private int numCols;
-	private float weight = 1.0f;
+	private float weight;
+	private int totalNodesToSearch;
+	private int numNodesSeen;
 
 	public Graph(Grid G){
 		g = G;
 		nodes = G.grid;
+		weight = 2.0f;
 		numRows = nodes.GetLength (0);
 		numCols = nodes.GetLength (1);
 	}
 
 	public List<Node> getPath(Vector3 start, Vector3 end) {
+
+		totalNodesToSearch = 80;
+		numNodesSeen = 0;
 
 		Vector3 startCoords = g.getGridCoords (start);
 		Vector3 endCoords = g.getGridCoords (end);
@@ -37,19 +43,30 @@ public class Graph : Object {
 
 		List<Node> failPath = new List<Node> ();
 		failPath.Add (startNode);
-		if (!endNode.free) //choose a closest valid endNode
-			return failPath;
+//		if (!endNode.free) //choose a closest valid endNode
+//			return failPath;
+		Node estimEndNode = startNode;
 
 		Dictionary<Node, Node> dictPath = new Dictionary<Node, Node> ();
 		while (open.Count > 0) {
 			Node current = findSmallestVal(open, end);
+			numNodesSeen += 1;
 			if (Vector3.Distance(endNode.loc, current.loc) <= 0.5f){
+//				Debug.Log ("numSeen: " + numNodesSeen);
 				return makePath(dictPath, endNode);
+			}
+			if (current.h < estimEndNode.h){
+//				Debug.Log("new estim");
+				estimEndNode = current;
+			}
+			if (numNodesSeen >= totalNodesToSearch){
+//				Debug.Log ("return makePath(dictPath, estimEndNode);");
+				return makePath(dictPath, estimEndNode);
 			}
 			open.Remove (current);
 			closed.Add (current);
 			foreach (Node successor in getNeighbors(current)){
-//				Debug.DrawLine (successor.loc, current.loc, Color.blue);
+				Debug.DrawLine (successor.loc, current.loc, Color.blue);
 				if (closed.Contains (successor)){
 					continue; //in the closed set
 				}
@@ -81,7 +98,6 @@ public class Graph : Object {
 		Node prevNode = endNode;
 		while (dictPath.ContainsKey(currentNode)) {
 			currentNode = dictPath[currentNode];
-			//Debug.DrawLine(prevNode.loc, currentNode.loc, Color.red);
 			prevNode = currentNode;
 			path.Add(currentNode);
 		}

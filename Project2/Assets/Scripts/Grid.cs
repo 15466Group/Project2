@@ -6,6 +6,7 @@ public class Grid : MonoBehaviour {
 
 	public float nodeSize;
 	public GameObject goal;
+	public GameObject plane;
 
 	private int obstacleLayer;
 //	private int goalLayer;
@@ -22,29 +23,29 @@ public class Grid : MonoBehaviour {
 	public GameObject dynamicObj;
 
 	// Use this for initialization
-	public void Start () {
-		worldWidth = transform.lossyScale.x * 10.0f; //plane
-		worldHeight = transform.lossyScale.z * 10.0f; //plane
+	public void initStart () {
+		worldWidth = plane.transform.lossyScale.x * 10.0f; //plane
+		worldHeight = plane.transform.lossyScale.z * 10.0f; //plane
 
 		gridWidth = Mathf.RoundToInt(worldWidth / nodeSize);
 		gridHeight = Mathf.RoundToInt(worldHeight / nodeSize);
 
 		grid = new Node[gridWidth, gridHeight];
 
-		worldNW = transform.position - (transform.right * worldWidth / 2.0f) + (transform.forward * worldHeight / 2.0f);
+		worldNW = plane.transform.position - (plane.transform.right * worldWidth / 2.0f) + (plane.transform.forward * worldHeight / 2.0f);
 
 		obstacleLayer = 1 << LayerMask.NameToLayer ("Obstacles");
 //		goalLayer = 1 << LayerMask.NameToLayer ("Goal");
 
-		//initializeGrid ();
+//		initializeGrid ();
 		updateGrid ();
 
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		//updateGrid ();
-	}
+//	void Update () {
+//		updateGrid ();
+//	}
 
 	Node[,] getGrid() {
 		return grid;
@@ -52,7 +53,7 @@ public class Grid : MonoBehaviour {
 
 
 //	public void initializeGrid() {
-//
+////		Debug.Log ("FACK");
 //		bool isGoal = false;
 //		for (int i = 0; i < gridWidth; i++) {
 //			for(int j = 0; j < gridWidth; j++) {
@@ -85,7 +86,8 @@ public class Grid : MonoBehaviour {
 //				}
 //			}
 //		}
-//	
+//		Vector3 goalGridCoords = getGridCoords (goal.transform.position);
+//		grid [(int) goalGridCoords.x, (int) goalGridCoords.z].isGoal = true;
 //	}
 //
 //	public void updateGrid() {
@@ -133,15 +135,17 @@ public class Grid : MonoBehaviour {
 //	}
 	
 	public void updateGrid(){
+//		Debug.Log ("old update");
 		for (int i = 0; i < gridWidth; i++) {
 			for (int j = 0; j < gridHeight; j ++) {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
 				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
 				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
-				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer);
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer); // | goalLayer
 				bool isGoal = checkIfContainsGoal(hits);
 				float h = Vector3.Distance(nodeCenter, goal.transform.position);
-				if(hits.Length == 0) {
+				int len = hits.Length;
+				if(len == 0) { //|| (len == 1 && isGoal)
 					grid[i,j] = new Node(true, nodeCenter, isGoal, i, j, h);
 				}
 				else {
@@ -154,10 +158,12 @@ public class Grid : MonoBehaviour {
 //	void OnDrawGizmos() {
 //		for (int i = 0; i < gridWidth; i++) {
 //			for (int j = 0; j < gridHeight; j ++) {
-//				if (!grid [i, j].free) {
-//					Gizmos.color = Color.red;
-//					if (grid[i,j].isGoal)
-//						Gizmos.color = Color.green;
+//				Gizmos.color = Color.red;
+//				if (grid[i,j].isGoal){
+//					Gizmos.color = Color.green;
+//					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
+//				}
+//				if (!grid[i,j].free) {
 //					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
 //				}
 //			}
