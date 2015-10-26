@@ -16,12 +16,14 @@ public class ReachGoal: NPCBehaviour {
 	public Vector3 transCoords;
 	public Vector3 endCoords;
 	public float swampCost;
+	private LayerMask dynamicLayer;
 
 	private float arrivalRadius;
-
+	
 	// Use this for initialization
 	public override void Start () {
 		base.Start ();
+		dynamicLayer = 1 << LayerMask.NameToLayer ("Dynamic");
 		endTarget = goal.transform.position;
 		acceleration = base.calculateAcceleration (target);
 		isWanderer = false;
@@ -75,6 +77,11 @@ public class ReachGoal: NPCBehaviour {
 	}
 
 	void checkArrival(){
-		inArrivalRadius = Vector3.Distance(goal.transform.position, transform.position) <= arrivalRadius;
+		Collider[] hits = Physics.OverlapSphere (transform.position, arrivalRadius, dynamicLayer);
+		if (hits.Length > 0) {
+			inArrivalRadius = false;
+		} else {
+			inArrivalRadius = Vector3.Distance (goal.transform.position, transform.position) <= arrivalRadius;
+		}
 	}
 }

@@ -11,6 +11,7 @@ public class Grid : MonoBehaviour {
 	private int obstacleLayer;
 	private int swampLayer;
 	private int goalLayer;
+	private int dynamicLayer;
 
 	public Node[,] grid;
 	private int gridWidth;
@@ -39,9 +40,11 @@ public class Grid : MonoBehaviour {
 		obstacleLayer = 1 << LayerMask.NameToLayer ("Obstacles");
 		swampLayer = 1 << LayerMask.NameToLayer ("Swamp");
 		goalLayer = 1 << LayerMask.NameToLayer ("Goal");
+		dynamicLayer = 1 << LayerMask.NameToLayer ("Dynamic");
 
 		initializeGrid ();
 		updateGrid ();
+
 
 	}
 	
@@ -144,7 +147,7 @@ public class Grid : MonoBehaviour {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
 				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
 				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
-				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer); // | goalLayer
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer | dynamicLayer); // | goalLayer
 				bool isGoal = checkIfContainsTag(hits, "Player");
 				float h = Vector3.Distance(nodeCenter, goal.transform.position);
 				int len = hits.Length;
@@ -179,7 +182,7 @@ public class Grid : MonoBehaviour {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
 				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
 				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
-				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer); // | goalLayer
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer | dynamicLayer); // | goalLayer
 				bool isGoal = checkIfContainsTag(hits, "Player");
 				float h = Vector3.Distance(nodeCenter, goal.transform.position);
 				int len = hits.Length;
