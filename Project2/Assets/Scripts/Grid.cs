@@ -201,20 +201,20 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-	void OnDrawGizmos() {
-		for (int i = 0; i < gridWidth; i++) {
-			for (int j = 0; j < gridHeight; j ++) {
-				Gizmos.color = Color.red;
-				if (grid[i,j].isGoal){
-					Gizmos.color = Color.green;
-					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
-				}
-				if (!grid[i,j].free) {
-					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
-				}
-			}
-		}
-	}
+//	void OnDrawGizmos() {
+//		for (int i = 0; i < gridWidth; i++) {
+//			for (int j = 0; j < gridHeight; j ++) {
+//				Gizmos.color = Color.red;
+//				if (grid[i,j].isGoal){
+//					Gizmos.color = Color.green;
+//					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
+//				}
+//				if (!grid[i,j].free) {
+//					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
+//				}
+//			}
+//		}
+//	}
 
 	bool checkIfContainsTag(Collider[] hits, string tag){
 		bool foundTag = false;

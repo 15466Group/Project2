@@ -17,6 +17,8 @@ public class ReachGoal: NPCBehaviour {
 	public Vector3 endCoords;
 	public float swampCost;
 
+	private float arrivalRadius;
+
 	// Use this for initialization
 	public override void Start () {
 		base.Start ();
@@ -30,6 +32,8 @@ public class ReachGoal: NPCBehaviour {
 		transCoords = next;
 		endCoords = new Vector3 (next.x + 10.0f, 0.0f, next.z + 10.0f);
 		tempPositions = new List<Node> ();
+		inArrivalRadius = false;
+		arrivalRadius = 20.0f;
 	}
 
 	public void nextStep () {
@@ -38,6 +42,7 @@ public class ReachGoal: NPCBehaviour {
 //		}
 		endTarget = goal.transform.position;
 		target = nextTarget();
+		checkArrival ();
 		base.Update ();
 	}
 
@@ -67,5 +72,9 @@ public class ReachGoal: NPCBehaviour {
 		endCoords = endCrds;
 		nextCoords = nxtCrds;
 		transCoords = trnsCrds;
+	}
+
+	void checkArrival(){
+		inArrivalRadius = Vector3.Distance(goal.transform.position, transform.position) <= arrivalRadius;
 	}
 }

@@ -21,7 +21,6 @@ public class Scheduler : MonoBehaviour {
 	private float timer;
 	private float searchTime;
 
-
 	// Use this for initialization
 	void Start () {
 		iChar = 0;

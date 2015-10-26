@@ -33,6 +33,7 @@ public class NPCBehaviour : MonoBehaviour {
 	
 	protected bool isWanderer { get; set; }
 	protected bool isReachingGoal { get; set; }
+	protected bool inArrivalRadius { get; set; }
 
 	public string idle;
 	public string walking;
@@ -209,15 +210,22 @@ public class NPCBehaviour : MonoBehaviour {
 	}
 	
 	void veloCloseToTarget () {
+//		if (isReachingGoal) {
+//			float epsilon = 0.7f;
+//			float xDistance = Mathf.Abs (transform.position.x - target.x);
+//			float zDistance = Mathf.Abs (transform.position.z - target.z);
+//			float distance = Mathf.Sqrt (xDistance * xDistance + zDistance * zDistance);
+//			if (distance <= epsilon) {
+//				speedMax = 0.0f; 
+//			} else { //exponential growth translated up by 10, capped at originalMaxSpeed
+//				speedMax = Mathf.Min (Mathf.Pow (1.1f, distance) + 10.0f, speedMaxDefault);
+//			}
+//		}
 		if (isReachingGoal) {
-			float epsilon = 0.7f;
-			float xDistance = Mathf.Abs (transform.position.x - target.x);
-			float zDistance = Mathf.Abs (transform.position.z - target.z);
-			float distance = Mathf.Sqrt (xDistance * xDistance + zDistance * zDistance);
-			if (distance <= epsilon) {
+			if (inArrivalRadius) {
 				speedMax = 0.0f; 
 			} else { //exponential growth translated up by 10, capped at originalMaxSpeed
-				speedMax = Mathf.Min (Mathf.Pow (1.1f, distance) + 10.0f, speedMaxDefault);
+				speedMax = Mathf.Min (Mathf.Pow (1.1f, Vector3.Distance(transform.position, target)) + 10.0f, speedMaxDefault);
 			}
 		}
 	}

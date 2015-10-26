@@ -8,6 +8,7 @@ public class GoalControl : MonoBehaviour {
 	private float scaler;
 	private Vector3 velocity;
 	private float walkingSpeed;
+	private Vector3 previousValidPos;
 	
 	void Start()
 	{
@@ -17,6 +18,7 @@ public class GoalControl : MonoBehaviour {
 		velocity = Vector3.zero;
 		anim = GetComponent<Animation> ();
 		anim.CrossFade ("soldierIdleRelaxed");
+		previousValidPos = transform.position;
 	}
 	void Update()
 	{
@@ -28,6 +30,7 @@ public class GoalControl : MonoBehaviour {
 		Vector3 targetPosition = transform.position + velocity * Time.deltaTime;
 		if (velocity != new Vector3())
 			RotateTo (targetPosition);
+		previousValidPos = transform.position;
 		transform.position += velocity * Time.deltaTime;
 		doAnimation ();
 		
@@ -54,5 +57,10 @@ public class GoalControl : MonoBehaviour {
 		//		Debug.DrawRay(transform.position,acceleration.normalized*10,Color.blue);
 		destinationRotation = Quaternion.LookRotation (relativePosition);
 		transform.rotation = Quaternion.Slerp (transform.rotation, destinationRotation, Time.deltaTime * smooth);
+	}
+
+	void OnCollisionEnter(Collision col){
+		Debug.Log (col.gameObject.name);
+		transform.position = previousValidPos;
 	}
 }

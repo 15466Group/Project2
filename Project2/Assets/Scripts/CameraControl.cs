@@ -4,11 +4,11 @@ using System.Collections;
 public class CameraControl : MonoBehaviour {
 	
 	public GameObject cameraLead;
-	private Vector3 offset = new Vector3 (0, 200, -50);
+	private Vector3 offset = new Vector3 (-16, 155, -25);
 	
 	void Start()
 	{
-		
+
 	}
 	void Update()
 	{
@@ -20,6 +20,7 @@ public class CameraControl : MonoBehaviour {
 		transform.position += velocity * Time.deltaTime;*/
 
 		transform.position = cameraLead.transform.position + offset;
-		transform.forward = cameraLead.transform.position - transform.position;
+//		transform.forward = cameraLead.transform.position - transform.position;
+//		transform.LookAt (new Vector3 (60, 0, 0));
 	}
 }
