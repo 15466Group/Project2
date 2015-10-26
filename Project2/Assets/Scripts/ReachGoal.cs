@@ -15,7 +15,7 @@ public class ReachGoal: NPCBehaviour {
 	public Vector3 nextCoords;
 	public Vector3 transCoords;
 	public Vector3 endCoords;
-
+	public float swampCost;
 
 	// Use this for initialization
 	public override void Start () {

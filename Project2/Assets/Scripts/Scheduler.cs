@@ -61,7 +61,7 @@ public class Scheduler : MonoBehaviour {
 //		graph = new Graph(G);
 		graph.g.updateGrid ();
 		timer += Time.deltaTime;
-		reachGoal.assignedPath (graph.getPath (start, end));
+		reachGoal.assignedPath (graph.getPath (start, end, reachGoal.swampCost));
 //		timer = 0.0f;
 //		if (timer >= searchTime || path.Count == 0) {
 //			reachGoal.assignedPath (graph.getPath (start, end));

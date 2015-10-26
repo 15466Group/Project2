@@ -33,6 +33,10 @@ public class NPCBehaviour : MonoBehaviour {
 	
 	protected bool isWanderer { get; set; }
 	protected bool isReachingGoal { get; set; }
+
+	public string idle;
+	public string walking;
+	public string running;
 	
 	// Use this for initialization
 	public virtual void Start () {
@@ -54,7 +58,7 @@ public class NPCBehaviour : MonoBehaviour {
 		accMag = accMagDefault;
 		speedMax = speedMaxDefault;
 		anim = GetComponent<Animation> ();
-		anim.CrossFade ("soldierIdleRelaxed");
+		anim.CrossFade (idle);
 	}
 	
 	// Update is called once per frame
@@ -68,11 +72,11 @@ public class NPCBehaviour : MonoBehaviour {
 	protected void doAnimation(){
 		float mag = velocity.magnitude;
 		if (mag > 0.0f && mag <= walkingSpeed) {
-			anim.CrossFade ("soldierWalk");
+			anim.CrossFade (walking);
 		} else if (mag > walkingSpeed) {
-			anim.CrossFade ("soldierRun");
+			anim.CrossFade (running);
 		} else {
-			anim.CrossFade("soldierIdleRelaxed");
+			anim.CrossFade(idle);
 		}
 	}
 

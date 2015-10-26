@@ -9,7 +9,8 @@ public class Grid : MonoBehaviour {
 	public GameObject plane;
 
 	private int obstacleLayer;
-//	private int goalLayer;
+	private int swampLayer;
+	private int goalLayer;
 
 	public Node[,] grid;
 	private int gridWidth;
@@ -19,8 +20,9 @@ public class Grid : MonoBehaviour {
 	private Vector3 worldNW; //world north west, top left corner of map/plane
 
 
-	public GameObject staticObj;
-	public GameObject dynamicObj;
+//	public GameObject staticObj;
+//	public GameObject dynamicObj;
+	public GameObject swamps;
 
 	// Use this for initialization
 	public void initStart () {
@@ -35,9 +37,10 @@ public class Grid : MonoBehaviour {
 		worldNW = plane.transform.position - (plane.transform.right * worldWidth / 2.0f) + (plane.transform.forward * worldHeight / 2.0f);
 
 		obstacleLayer = 1 << LayerMask.NameToLayer ("Obstacles");
-//		goalLayer = 1 << LayerMask.NameToLayer ("Goal");
+		swampLayer = 1 << LayerMask.NameToLayer ("Swamp");
+		goalLayer = 1 << LayerMask.NameToLayer ("Goal");
 
-//		initializeGrid ();
+		initializeGrid ();
 		updateGrid ();
 
 	}
@@ -133,6 +136,41 @@ public class Grid : MonoBehaviour {
 //		return bounds;
 //
 //	}
+
+	public void initializeGrid(){
+		//		Debug.Log ("old update");
+		for (int i = 0; i < gridWidth; i++) {
+			for (int j = 0; j < gridHeight; j ++) {
+				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
+				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
+				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer); // | goalLayer
+				bool isGoal = checkIfContainsTag(hits, "Player");
+				float h = Vector3.Distance(nodeCenter, goal.transform.position);
+				int len = hits.Length;
+				if(len == 0) { //|| (len == 1 && isGoal)
+					grid[i,j] = new Node(true, nodeCenter, isGoal, i, j, h, false);
+				}
+				else {
+					bool isSwamp = checkIfContainsTag(hits, "Swamp");
+					bool free;
+					if (isSwamp && (len == 1 || (len == 2 && isGoal))){
+						free = true;
+					}
+					else {
+						free = false;
+					}
+					grid[i,j] = new Node(free, nodeCenter, isGoal, i, j, h, isSwamp);
+//					if (isSwamp)
+//						Debug.Log ("(" + i + ", " + j + ")"); 
+				}
+			}
+		}
+		int swampCount = swamps.transform.childCount;
+		for (int k = 0; k < swampCount; k++) {
+			swamps.transform.GetChild(k).GetComponent<MeshCollider>().enabled = false;
+		}
+	}
 	
 	public void updateGrid(){
 //		Debug.Log ("old update");
@@ -141,46 +179,52 @@ public class Grid : MonoBehaviour {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
 				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
 				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
-				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer); // | goalLayer
-				bool isGoal = checkIfContainsGoal(hits);
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer); // | goalLayer
+				bool isGoal = checkIfContainsTag(hits, "Player");
 				float h = Vector3.Distance(nodeCenter, goal.transform.position);
 				int len = hits.Length;
 				if(len == 0) { //|| (len == 1 && isGoal)
-					grid[i,j] = new Node(true, nodeCenter, isGoal, i, j, h);
+					grid[i,j] = new Node(true, nodeCenter, isGoal, i, j, h, grid[i,j].isSwamp);
 				}
 				else {
-					grid[i,j] = new Node(false, nodeCenter, isGoal, i, j, h);
+					bool isSwamp = checkIfContainsTag(hits, "Swamp");
+					bool free;
+					if (isSwamp && (len == 1 || (len == 2 && isGoal))){
+						free = true;
+					}
+					else {
+						free = false;
+					}
+					grid[i,j] = new Node(free, nodeCenter, isGoal, i, j, h, grid[i,j].isSwamp);
 				}
 			}
 		}
 	}
 
-//	void OnDrawGizmos() {
-//		for (int i = 0; i < gridWidth; i++) {
-//			for (int j = 0; j < gridHeight; j ++) {
-//				Gizmos.color = Color.red;
-//				if (grid[i,j].isGoal){
-//					Gizmos.color = Color.green;
-//					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
-//				}
-//				if (!grid[i,j].free) {
-//					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
-//				}
-//			}
-//		}
-//	}
+	void OnDrawGizmos() {
+		for (int i = 0; i < gridWidth; i++) {
+			for (int j = 0; j < gridHeight; j ++) {
+				Gizmos.color = Color.red;
+				if (grid[i,j].isGoal){
+					Gizmos.color = Color.green;
+					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
+				}
+				if (!grid[i,j].free) {
+					Gizmos.DrawCube (grid [i, j].loc, new Vector3 (nodeSize, 1.0f, nodeSize));
+				}
+			}
+		}
+	}
 
-	bool checkIfContainsGoal(Collider[] hits){
-		bool isGoal = false;
-		float epsilon = 0.5f;
+	bool checkIfContainsTag(Collider[] hits, string tag){
+		bool foundTag = false;
 		foreach (Collider hit in hits) {
-			float distance = Vector3.Distance(goal.transform.position, hit.transform.position);
-			if (distance <= epsilon){
-				isGoal = true;
+			if (hit.CompareTag(tag)){
+				foundTag = true;
 				break;
 			}
 		}
-		return isGoal;
+		return foundTag;
 	}
 
 	public Vector3 getGridCoords(Vector3 location) {

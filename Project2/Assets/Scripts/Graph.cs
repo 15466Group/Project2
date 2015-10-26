@@ -20,7 +20,7 @@ public class Graph : Object {
 		numCols = nodes.GetLength (1);
 	}
 
-	public List<Node> getPath(Vector3 start, Vector3 end) {
+	public List<Node> getPath(Vector3 start, Vector3 end, float swampCost) {
 
 		totalNodesToSearch = 80;
 		numNodesSeen = 0;
@@ -70,7 +70,7 @@ public class Graph : Object {
 				if (closed.Contains (successor)){
 					continue; //in the closed set
 				}
-				float newCost = current.g + costOfStep(current, successor);
+				float newCost = current.g + costOfStep(current, successor, swampCost);
 				if (!open.Contains(successor)){
 					open.Add (successor);
 				}
@@ -122,8 +122,14 @@ public class Graph : Object {
 	}
 
 	//simple movements only
-	float costOfStep(Node currNode, Node nextNode){
-		return Vector3.Distance (currNode.loc, nextNode.loc);
+	float costOfStep(Node currNode, Node nextNode, float swampCost){
+		float cost = Vector3.Distance (currNode.loc, nextNode.loc);
+//		if ((currNode.isSwamp && !nextNode.isSwamp) ||
+//		    (!currNode.isSwamp && nextNode.isSwamp)){
+		if (currNode.isSwamp || nextNode.isSwamp){
+			cost *= swampCost;
+		}
+		return cost;
 	}
 
 	List<Node> getNeighbors(Node n) {
