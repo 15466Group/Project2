@@ -22,7 +22,7 @@ public class Graph : Object {
 
 	public List<Node> getPath(Vector3 start, Vector3 end, float swampCost) {
 
-		totalNodesToSearch = 80;
+		totalNodesToSearch = 100;
 		numNodesSeen = 0;
 
 		Vector3 startCoords = g.getGridCoords (start);

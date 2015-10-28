@@ -44,7 +44,7 @@ public class NPCBehaviour : MonoBehaviour {
 		velocity = new Vector3 ();
 		acceleration = new Vector3 ();
 		accMagDefault = 50.0f;
-		speedMaxDefault = 20.0f;
+		speedMaxDefault = 14.0f;
 		walkingSpeed = 15.0f;
 		epsilon = 2.0f;
 		searchRadius = 100.0f;

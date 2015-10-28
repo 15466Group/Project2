@@ -169,9 +169,11 @@ public class Grid : MonoBehaviour {
 				}
 			}
 		}
-		int swampCount = swamps.transform.childCount;
-		for (int k = 0; k < swampCount; k++) {
-			swamps.transform.GetChild(k).GetComponent<MeshCollider>().enabled = false;
+		if (swamps != null) {
+			int swampCount = swamps.transform.childCount;
+			for (int k = 0; k < swampCount; k++) {
+				swamps.transform.GetChild (k).GetComponent<MeshCollider> ().enabled = false;
+			}
 		}
 	}
 	
