@@ -147,7 +147,7 @@ public class Grid : MonoBehaviour {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
 				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
 				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
-				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer | dynamicLayer); // | goalLayer
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | dynamicLayer); // | goalLayer
 				bool isGoal = checkIfContainsTag(hits, "Player");
 				float h = Vector3.Distance(nodeCenter, goal.transform.position);
 				int len = hits.Length;
@@ -157,7 +157,7 @@ public class Grid : MonoBehaviour {
 				else {
 					bool isSwamp = checkIfContainsTag(hits, "Swamp");
 					bool free;
-					if (isSwamp && (len == 1 || (len == 2 && isGoal))){
+					if ((isSwamp || isGoal) && len == 1){
 						free = true;
 					}
 					else {
@@ -184,7 +184,7 @@ public class Grid : MonoBehaviour {
 				float xp = i * nodeSize + (nodeSize/2.0f) + worldNW.x;
 				float zp = -(j * nodeSize + (nodeSize/2.0f)) + worldNW.z;
 				Vector3 nodeCenter = new Vector3(xp, 0.0f, zp);
-				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | goalLayer | dynamicLayer); // | goalLayer
+				Collider[] hits = Physics.OverlapSphere(nodeCenter, nodeSize/2.0f, obstacleLayer | swampLayer | dynamicLayer); // | goalLayer
 				bool isGoal = checkIfContainsTag(hits, "Player");
 				float h = Vector3.Distance(nodeCenter, goal.transform.position);
 				int len = hits.Length;
@@ -194,7 +194,8 @@ public class Grid : MonoBehaviour {
 				else {
 					bool isSwamp = checkIfContainsTag(hits, "Swamp");
 					bool free;
-					if (isSwamp && (len == 1 || (len == 2 && isGoal))){
+					//if (isSwamp && (len == 1 || (len == 2 && isGoal))){
+					if ((isSwamp || isGoal) && len == 1){
 						free = true;
 					}
 					else {

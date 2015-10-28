@@ -11,6 +11,7 @@ public class ReachGoal: NPCBehaviour {
 	private bool hitNextNode;
 
 	public List<Node> tempPositions;
+	//public Dictionary<Node, Node> dictPath;
 	public Vector3 next;
 	public Vector3 nextCoords;
 	public Vector3 transCoords;
@@ -39,9 +40,9 @@ public class ReachGoal: NPCBehaviour {
 	}
 
 	public void nextStep () {
-//		for(int i = 0; i < tempPositions.Count - 1; i++) {
-//			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.yellow);
-//		}
+		for(int i = 0; i < tempPositions.Count - 1; i++) {
+			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.yellow);
+		}
 		endTarget = goal.transform.position;
 		target = nextTarget();
 		checkArrival ();
@@ -57,17 +58,20 @@ public class ReachGoal: NPCBehaviour {
 			hitNextNode = true;
 		}
 		if (hitNextNode && tempPositions.Count > 0){
-			next = tempPositions [0].loc;
+			Node n = tempPositions[0];
+			next = n.loc;
 			tempPositions.RemoveAt (0);
+			//dictPath.Remove(n);
 			hitNextNode = false;
 		}
 //		Debug.Log("t + " + transform.position + "n + " + next);
 		return next;
 	}
 
-	public void assignedPath(List<Node> path){
+	public void assignedPath(List<Node> path){//, Dictionary<Node, Node> d){
 		tempPositions = path;
 		hitNextNode = true;
+		//dictPath = d;
 	}
 
 	public void assignGridCoords(Vector3 nxtCrds, Vector3 trnsCrds, Vector3 endCrds){
