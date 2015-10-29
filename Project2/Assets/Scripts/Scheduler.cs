@@ -19,8 +19,8 @@ public class Scheduler : MonoBehaviour {
 	private int numChars;
 
 	private State[] states;
-	private bool[] useOlds;
-	private List<Node>[] prevPaths;
+//	private bool[] useOlds;
+//	private List<Node>[] prevPaths;
 
 	// Use this for initialization
 	void Start () {
@@ -42,7 +42,7 @@ public class Scheduler : MonoBehaviour {
 		}
 
 		//useOlds = new bool[numChars];
-		prevPaths = new List<Node>[numChars];
+//		prevPaths = new List<Node>[numChars];
 	}
 	
 	// Update is called once per frame
@@ -64,26 +64,31 @@ public class Scheduler : MonoBehaviour {
 		//if the guy's in the middle of a search
 		State s = states [iChar];
 		if (!s.ongoing) {
-			Vector3 startCoords = G.getGridCoords (currChar.position);
-			Vector3 endCoords = G.getGridCoords (reachGoal.goal.transform.position);
+			graph.g.updateGrid();
+			Vector3 startCoords = graph.g.getGridCoords (currChar.position);
+			Vector3 endCoords = graph.g.getGridCoords (goal.transform.position);
 			int startI = (int)startCoords.x;
 			int startJ = (int)startCoords.z;
 			int endI = (int)endCoords.x;
 			int endJ = (int)endCoords.z;
-			s.startNode = G.grid [startI, startJ];
+			s.startNode = graph.g.grid [startI, startJ];
 			s.startNode.g = 0.0f;
 			s.startNode.f = s.startNode.g + graph.weight * s.startNode.h;
 			s.open.Add (s.startNode);
-			s.endNode = G.grid [endI, endJ];
-			s.sGrid = G;
-			//s.hasFullPath = true;
+			s.endNode = graph.g.grid [endI, endJ];
+			s.sGrid = graph.g;
+//			s.hasFullPath = true;
 		}
 
-		states[iChar] = graph.setState (s);
-//		List<Node> path = states [iChar].path;
+		states[iChar] = graph.getPath (s);
+		List<Node> path = states[iChar].path;
+		if (states [iChar].path.Count == 0) {
+			Debug.Log ("states[iChar].path == 0, in scheduler");
+			Debug.Break ();
+		}
 //		Debug.Log (path);
 //		prevPaths [iChar] = path;
-		reachGoal.assignedPath (states [iChar].path);
+		reachGoal.assignedPath (path);
 
 
 		for (int i = 0; i < numChars; i++) {
@@ -94,7 +99,8 @@ public class Scheduler : MonoBehaviour {
 			                            graph.g.getGridCoords(goal.transform.position));
 
 			Node r = reachGoal.nextStep ();
-			if(r != null) {
+//			if(r != null) {
+//				bool a = states[i].path.Remove(r);
 //				if (states[i].dictPath.Count > 0)
 //				foreach(Node key in states[i].dictPath.Keys) {
 //					if(states[i].dictPath[key] == r) {
@@ -102,13 +108,20 @@ public class Scheduler : MonoBehaviour {
 //						break;
 //					}
 //				}
-				states[i].dictPath.Remove (r);
-				bool a = states[i].path.Remove(r);
+//				states[i].dictPath.Remove (r);
 //				Debug.Log (a);
 //				prevPaths[i].Remove (r);
-			}
+//			}
 
 		}
+//		reachGoal.assignGridCoords (graph.g.getGridCoords(reachGoal.next), 
+//		                            graph.g.getGridCoords(currChar.transform.position),
+//		                            graph.g.getGridCoords(goal.transform.position));
+//		
+//		Node r = reachGoal.nextStep ();
+//		if (r != null) {
+//			bool a = states [iChar].path.Remove (r);
+//		}
 		iChar = (iChar + 1) % numChars;
 	}
 }

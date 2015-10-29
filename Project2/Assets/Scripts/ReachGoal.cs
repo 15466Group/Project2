@@ -63,7 +63,7 @@ public class ReachGoal: NPCBehaviour {
 		if (hitNextNode && tempPositions.Count > 0){
 			n = tempPositions[0];
 			next = n.loc;
-			//tempPositions.RemoveAt (0);
+//			tempPositions.RemoveAt (0);
 			//dictPath.Remove(n);
 			hitNextNode = false;
 		}
@@ -73,9 +73,13 @@ public class ReachGoal: NPCBehaviour {
 
 	public void assignedPath(List<Node> path){//, Dictionary<Node, Node> d){
 		tempPositions = path;
-		hitNextNode = false;
-		if(tempPositions.Count > 0)
-			next = tempPositions [0].loc;
+		if (path.Count == 0) {
+			Debug.Log ("path.count == 0, in reachGoal");
+			Debug.Break();
+		}
+		hitNextNode = true;
+//		if(tempPositions.Count > 0)
+//			next = tempPositions [0].loc;
 		//dictPath = d;
 	}
 

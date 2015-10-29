@@ -13,7 +13,6 @@ public class Graph : Object {
 	private int numNodesSeen;
 	public bool useOld;
 	public State oldState;
-	public bool seenEnd;
 
 	public Graph(Grid G){
 		g = G;
@@ -22,10 +21,9 @@ public class Graph : Object {
 		numRows = nodes.GetLength (0);
 		numCols = nodes.GetLength (1);
 		useOld = false;
-		seenEnd = false;
 	}
 
-	public State setState(State S){
+//	public State setState(State S){
 
 //		useOld = false;
 //		seenEnd = false;
@@ -40,7 +38,7 @@ public class Graph : Object {
 //
 //		List<Node> path;
 
-		return getPath (S);
+//		return getPath (S);
 //		if (useOld){
 //		return getPath (S.open, S.closed, S.dictPath, startNode, endNode, S.swampCost);
 //		} else {
@@ -56,8 +54,9 @@ public class Graph : Object {
 		//set old stuff
 		//check if next frame needs to use old
 //		return path;
-	}
+//	}
 
+	//make sure the goalNode is not red. if it is, s.ongoing = false
 	public State getPath(State s) {
 
 		totalNodesToSearch = 100;
@@ -74,7 +73,6 @@ public class Graph : Object {
 			numNodesSeen += 1;
 			if (Vector3.Distance(s.endNode.loc, current.loc) <= 0.5f){
 				s.path = makePath (s.dictPath, s.endNode);
-				seenEnd = true;
 				s.open = new List<Node> ();
 				s.closed = new List<Node> ();
 				s.startNode = null;
@@ -92,6 +90,15 @@ public class Graph : Object {
 				s.ongoing = true;
 				if (!s.hasFullPath)
 					s.path = makePath(s.dictPath, estimEndNode);
+//				s.path = makePath (s.dictPath, estimEndNode);
+//				s.open = new List<Node> ();
+//				s.closed = new List<Node> ();
+//				s.startNode = null;
+//				s.endNode = null;
+//				s.sGrid = null;
+//				s.ongoing = false;
+//				s.dictPath = new Dictionary<Node, Node> ();
+//				s.hasFullPath = true;
 				return s;
 			}
 			s.open.Remove (current);
@@ -127,19 +134,23 @@ public class Graph : Object {
 		List<Node> path = new List<Node> ();
 		Node currentNode = endNode;
 		path.Add (currentNode);
-		Node prevNode = endNode;
+//		Node prevNode = endNode;
 		while (dictPath.ContainsKey(currentNode)) {
 			currentNode = dictPath[currentNode];
-			prevNode = currentNode;
+//			prevNode = currentNode;
 			path.Add(currentNode);
 		}
 		path.Reverse ();
 		if (path.Count > 0) {
 			path.RemoveAt (0);
+		} 
+		if (path.Count == 0) {
+			Debug.Log ("path.Count == 0, in Graph");
+			Debug.Break();
 		}
-		if (path.Count > 0) {
-			path.RemoveAt (0);
-		}
+//		if (path.Count > 0) {
+//			path.RemoveAt (0);
+//		}
 		return path;
 	}
 
