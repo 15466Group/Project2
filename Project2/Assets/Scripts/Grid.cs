@@ -53,7 +53,7 @@ public class Grid : MonoBehaviour {
 //		updateGrid ();
 //	}
 
-	Node[,] getGrid() {
+	public Node[,] getGrid() {
 		return grid;
 	}
 

@@ -8,7 +8,7 @@ public class Graph : Object {
 	public Grid g;
 	private int numRows;
 	private int numCols;
-	private float weight;
+	public float weight;
 	private int totalNodesToSearch;
 	private int numNodesSeen;
 	public bool useOld;
@@ -25,35 +25,24 @@ public class Graph : Object {
 		seenEnd = false;
 	}
 
-	public List<Node> setState(State S, bool addStart, Vector3 start){
+	public State setState(State S){
 
-		useOld = false;
-		seenEnd = false;
-		Vector3 startCoords = g.getGridCoords (start);
-		Vector3 endCoords = g.getGridCoords (S.end);
-		int startI = (int)startCoords.x;
-		int startJ = (int)startCoords.z;
-		int endI = (int)endCoords.x;
-		int endJ = (int)endCoords.z;
-		Node startNode = nodes [startI, startJ];
-		Node endNode = nodes [endI, endJ];
+//		useOld = false;
+//		seenEnd = false;
+//		Vector3 startCoords = g.getGridCoords (s.startNo);
+//		Vector3 endCoords = g.getGridCoords (S.end);
+//		int startI = (int)startCoords.x;
+//		int startJ = (int)startCoords.z;
+//		int endI = (int)endCoords.x;
+//		int endJ = (int)endCoords.z;
+//		Node startNode = nodes [startI, startJ];
+//		Node endNode = nodes [endI, endJ];
+//
+//		List<Node> path;
 
-		List<Node> path;
-
-		//not sure about this
-		if (addStart) {
-			startNode.g = 0;
-			startNode.f = startNode.g + weight * startNode.h;
-			S.open.Add (startNode);
-		} else {
-			g = S.sGrid;
-//			startNode.g = 0;
-//			startNode.f = startNode.g + weight * startNode.h;
-//			S.open.Add (startNode);
-		}
-
+		return getPath (S);
 //		if (useOld){
-		return getPath (S.open, S.closed, S.dictPath, startNode, endNode, S.swampCost);
+//		return getPath (S.open, S.closed, S.dictPath, startNode, endNode, S.swampCost);
 //		} else {
 //			List<Node> open = new List<Node> ();
 //			List<Node> closed = new List<Node> ();
@@ -69,63 +58,52 @@ public class Graph : Object {
 //		return path;
 	}
 
-	public List<Node> getPath(List<Node> open, List<Node> closed, Dictionary<Node, Node> dictPath, 
-	                          Node startNode, Node endNode, float swampCost) {
+	public State getPath(State s) {
 
 		totalNodesToSearch = 100;
 		numNodesSeen = 0;
-
-//		Vector3 startCoords = g.getGridCoords (start);
-//		Vector3 endCoords = g.getGridCoords (end);
-//		int startI = (int)startCoords.x;
-//		int startJ = (int)startCoords.z;
-//		int endI = (int)endCoords.x;
-//		int endJ = (int)endCoords.z;
-//
-//		Node startNode = nodes [startI, startJ];
-//		Node endNode = nodes [endI, endJ];
-//		startNode.g = 0;
-//		startNode.f = startNode.g + weight * startNode.h;
-//
-//		List<Node> open = new List<Node> ();
-//		List<Node> closed = new List<Node> ();
-//		open.Add (startNode);
-//
 
 		//infinite heuristic
 		Node estimEndNode = new Node(false, Vector3.zero, false, 0, 0, Mathf.Infinity, false);
 
 		List<Node> failPath = new List<Node> ();
-		failPath.Add (endNode);
+		failPath.Add (s.endNode);
 
-		while (open.Count > 0) {
-			Node current = findSmallestVal(open);
+		while (s.open.Count > 0) {
+			Node current = findSmallestVal(s.open);
 			numNodesSeen += 1;
-			if (Vector3.Distance(endNode.loc, current.loc) <= 0.5f){
-//				Debug.Log ("numSeen: " + numNodesSeen);
+			if (Vector3.Distance(s.endNode.loc, current.loc) <= 0.5f){
+				s.path = makePath (s.dictPath, s.endNode);
 				seenEnd = true;
-				return makePath(dictPath, endNode);
+				s.open = new List<Node> ();
+				s.closed = new List<Node> ();
+				s.startNode = null;
+				s.endNode = null;
+				s.sGrid = null;
+				s.ongoing = false;
+				s.dictPath = new Dictionary<Node, Node> ();
+				s.hasFullPath = true;
+				return s;
 			}
 			if (current.h < estimEndNode.h){
-//				Debug.Log("new estim");
 				estimEndNode = current;
 			}
 			if (numNodesSeen >= totalNodesToSearch){
-//				Debug.Log ("return makePath(dictPath, estimEndNode);");
-				useOld = true;
-				oldState = new State(open, closed, dictPath, endNode.loc, swampCost, g);
-				return makePath(dictPath, estimEndNode);
+				s.ongoing = true;
+				if (!s.hasFullPath)
+					s.path = makePath(s.dictPath, estimEndNode);
+				return s;
 			}
-			open.Remove (current);
-			closed.Add (current);
+			s.open.Remove (current);
+			s.closed.Add (current);
 			foreach (Node successor in getNeighbors(current)){
 				Debug.DrawLine (successor.loc, current.loc, Color.blue);
-				if (closed.Contains (successor)){
+				if (s.closed.Contains (successor)){
 					continue; //in the closed set
 				}
-				float newCost = current.g + costOfStep(current, successor, swampCost);
-				if (!open.Contains(successor)){
-					open.Add (successor);
+				float newCost = current.g + costOfStep(current, successor, s.swampCost);
+				if (!s.open.Contains(successor)){
+					s.open.Add (successor);
 				}
 				else if (successor.g <= newCost){
 					continue;
@@ -133,15 +111,16 @@ public class Graph : Object {
 
 				successor.g = newCost;
 				successor.f = successor.g + weight * successor.h;
-				if(dictPath.ContainsKey (successor)) {
-					dictPath[successor] = current;
+				if(s.dictPath.ContainsKey (successor)) {
+					s.dictPath[successor] = current;
 				}
 				else {
-					dictPath.Add(successor, current); //successor came from smallestVal, to reconstruct path backwards
+					s.dictPath.Add(successor, current); //successor came from smallestVal, to reconstruct path backwards
 				}
 			}
 		}
-		return failPath;
+		Debug.Log ("got here");
+		return s;
 	}
 
 	List<Node> makePath(Dictionary<Node, Node> dictPath, Node endNode){
@@ -155,8 +134,12 @@ public class Graph : Object {
 			path.Add(currentNode);
 		}
 		path.Reverse ();
-		if (path.Count > 0)
+		if (path.Count > 0) {
 			path.RemoveAt (0);
+		}
+		if (path.Count > 0) {
+			path.RemoveAt (0);
+		}
 		return path;
 	}
 

@@ -31,14 +31,17 @@ public class Scheduler : MonoBehaviour {
 		G = GetComponent<Grid> ();
 		G.initStart ();
 		graph = new Graph (G);
+		states = new State[numChars];
 		for (int i = 0; i < numChars; i++) {
 			Transform child = characters.transform.GetChild(i);
 			reachGoal = child.GetComponent<ReachGoal> ();
 			reachGoal.Start();
+
+			states[i] = new State(new List<Node> (), new List<Node> (), new Dictionary<Node, Node> (),
+			                      null, null, reachGoal.swampCost, G, null, false, false);
 		}
 
-		states = new State[numChars];
-		useOlds = new bool[numChars];
+		//useOlds = new bool[numChars];
 		prevPaths = new List<Node>[numChars];
 	}
 	
@@ -51,7 +54,6 @@ public class Scheduler : MonoBehaviour {
 		//every char is moving at each frame, but at frame i % numChars,
 		//	char i is moving according to new graph and everyone else is moving according to their 'current' graphs
 		Transform currChar = characters.transform.GetChild (iChar);
-		iChar = (iChar + 1) % numChars;
 
 		reachGoal = currChar.GetComponent<ReachGoal> ();
 		Vector3 start = currChar.transform.position;
@@ -59,47 +61,30 @@ public class Scheduler : MonoBehaviour {
 //		G.updateGrid ();
 //		graph = new Graph(G);
 		//graph.g.updateGrid ();
-		List<Node> path;
-		if (useOlds [iChar]) {
-			State s = states [iChar];
-			path = graph.setState (s, false, start);
-			if(graph.seenEnd) {
-				prevPaths[iChar] = path;
-			}
-			else {
-				if(prevPaths[iChar] != null)
-					path = prevPaths[iChar];
-			}
-//			reachGoal.assignedPath (path, s.dictPath);
-			reachGoal.assignedPath (path);
+		//if the guy's in the middle of a search
+		State s = states [iChar];
+		if (!s.ongoing) {
+			Vector3 startCoords = G.getGridCoords (currChar.position);
+			Vector3 endCoords = G.getGridCoords (reachGoal.goal.transform.position);
+			int startI = (int)startCoords.x;
+			int startJ = (int)startCoords.z;
+			int endI = (int)endCoords.x;
+			int endJ = (int)endCoords.z;
+			s.startNode = G.grid [startI, startJ];
+			s.startNode.g = 0.0f;
+			s.startNode.f = s.startNode.g + graph.weight * s.startNode.h;
+			s.open.Add (s.startNode);
+			s.endNode = G.grid [endI, endJ];
+			s.sGrid = G;
+			//s.hasFullPath = true;
 		}
-		else {
-			graph.g.updateGrid ();
-			Dictionary<Node, Node> dictPath = new Dictionary<Node, Node> ();
-			List<Node> open = new List<Node> ();
-			List<Node> closed = new List<Node> ();
-			State s = new State(open, closed, dictPath, end, reachGoal.swampCost, graph.g);
-			path = graph.setState (s, true, start);
-			if(graph.seenEnd) {
-				prevPaths[iChar] = path;
-			}
-			else {
-				if(prevPaths[iChar] != null)
-					path = prevPaths[iChar];
-			}
-//			reachGoal.assignedPath (path, s.dictPath);
-			reachGoal.assignedPath (path);
-		}
-		useOlds [iChar] = graph.useOld;
-//		if (graph.useOld) {
-		states[iChar] = graph.oldState;
-//		}
-//		reachGoal.nextStep ();
 
-		//the character has moved a bit and gotten rid of some of the beginning of the path so update it
-//		if (prevPaths [iChar] != null) {
-//			prevPaths[iChar] = reachGoal.tempPositions;
-//		}
+		states[iChar] = graph.setState (s);
+//		List<Node> path = states [iChar].path;
+//		Debug.Log (path);
+//		prevPaths [iChar] = path;
+		reachGoal.assignedPath (states [iChar].path);
+
 
 		for (int i = 0; i < numChars; i++) {
 			Transform child = characters.transform.GetChild(i);
@@ -107,16 +92,23 @@ public class Scheduler : MonoBehaviour {
 			reachGoal.assignGridCoords (graph.g.getGridCoords(reachGoal.next), 
 			                            graph.g.getGridCoords(child.transform.position),
 			                            graph.g.getGridCoords(goal.transform.position));
-			
-			reachGoal.nextStep ();
-			
-			//the character has moved a bit and gotten rid of some of the beginning of the path so update it
-			List<Node> iPrevPath = prevPaths[i];
-			if (iPrevPath != null){
-				prevPaths[i] = reachGoal.tempPositions;
+
+			Node r = reachGoal.nextStep ();
+			if(r != null) {
+//				if (states[i].dictPath.Count > 0)
+//				foreach(Node key in states[i].dictPath.Keys) {
+//					if(states[i].dictPath[key] == r) {
+//						states[i].dictPath.Remove (key);
+//						break;
+//					}
+//				}
+				states[i].dictPath.Remove (r);
+				bool a = states[i].path.Remove(r);
+//				Debug.Log (a);
+//				prevPaths[i].Remove (r);
 			}
-//			if (states[iChar] != null)
-//				states[iChar].dictPath = reachGoal.dictPath;
+
 		}
+		iChar = (iChar + 1) % numChars;
 	}
 }

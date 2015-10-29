@@ -18,6 +18,7 @@ public class ReachGoal: NPCBehaviour {
 	public Vector3 endCoords;
 	public float swampCost;
 	private LayerMask dynamicLayer;
+	private Node n;
 
 	private float arrivalRadius;
 	
@@ -39,7 +40,7 @@ public class ReachGoal: NPCBehaviour {
 		arrivalRadius = 20.0f;
 	}
 
-	public void nextStep () {
+	public Node nextStep () {
 		for(int i = 0; i < tempPositions.Count - 1; i++) {
 			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.yellow);
 		}
@@ -47,6 +48,7 @@ public class ReachGoal: NPCBehaviour {
 		target = nextTarget();
 		checkArrival ();
 		base.Update ();
+		return n;
 	}
 
 	Vector3 nextTarget (){
@@ -57,10 +59,11 @@ public class ReachGoal: NPCBehaviour {
 		    (transCoords.x != endCoords.x || transCoords.z != endCoords.z)) {
 			hitNextNode = true;
 		}
+		n = null;
 		if (hitNextNode && tempPositions.Count > 0){
-			Node n = tempPositions[0];
+			n = tempPositions[0];
 			next = n.loc;
-			tempPositions.RemoveAt (0);
+			//tempPositions.RemoveAt (0);
 			//dictPath.Remove(n);
 			hitNextNode = false;
 		}
@@ -70,7 +73,9 @@ public class ReachGoal: NPCBehaviour {
 
 	public void assignedPath(List<Node> path){//, Dictionary<Node, Node> d){
 		tempPositions = path;
-		hitNextNode = true;
+		hitNextNode = false;
+		if(tempPositions.Count > 0)
+			next = tempPositions [0].loc;
 		//dictPath = d;
 	}
 
