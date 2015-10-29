@@ -13,8 +13,6 @@ public class Node : IEquatable<Node> {
 	public float g { get; set;}
 	public float h { get; set;}
 	public bool isSwamp { get; set; }
-//	public bool open;
-//	public bool closed { get; set;}
 
 	public Node (bool isFree, Vector3 pos, bool isG, int newi, int newj, float heuristic, bool swamp) {
 		free = isFree;
@@ -26,8 +24,6 @@ public class Node : IEquatable<Node> {
 		g = Mathf.Infinity;
 		h = heuristic;
 		isSwamp = swamp;
-//		open = true;
-//		closed = false;
 	}
 
 	public bool Equals(Node other){

@@ -10,18 +10,17 @@ public class ReachGoal: NPCBehaviour {
 	private float searchTime;
 	private bool hitNextNode;
 
-	public List<Node> tempPositions;
-	//public Dictionary<Node, Node> dictPath;
+	public List<Node> path;
 	public Vector3 next;
 	public Vector3 nextCoords;
 	public Vector3 transCoords;
 	public Vector3 endCoords;
 	public float swampCost;
 	private LayerMask dynamicLayer;
-	private Node n;
 
 	private float arrivalRadius;
-	
+	private Node n;
+
 	// Use this for initialization
 	public override void Start () {
 		base.Start ();
@@ -35,14 +34,14 @@ public class ReachGoal: NPCBehaviour {
 		nextCoords = next;
 		transCoords = next;
 		endCoords = new Vector3 (next.x + 10.0f, 0.0f, next.z + 10.0f);
-		tempPositions = new List<Node> ();
+		path = new List<Node> ();
 		inArrivalRadius = false;
-		arrivalRadius = 20.0f;
+		arrivalRadius = 25.0f;
 	}
 
 	public Node nextStep () {
-		for(int i = 0; i < tempPositions.Count - 1; i++) {
-			Debug.DrawLine (tempPositions[i].loc, tempPositions[i+1].loc, Color.yellow);
+		for(int i = 0; i < path.Count - 1; i++) {
+			Debug.DrawLine (path[i].loc, path[i+1].loc, Color.yellow);
 		}
 		endTarget = goal.transform.position;
 		target = nextTarget();
@@ -51,36 +50,30 @@ public class ReachGoal: NPCBehaviour {
 		return n;
 	}
 
+	//next is the position of the node that the character performs reachGoal on
 	Vector3 nextTarget (){
-//		Vector3 nextCoords = G.getGridCoords (next);
-//		Vector3 transCoords = G.getGridCoords (transform.position);
-		// grid[.x, .z] == grid[i, j]
+		//if in next position's cell is same cell as the current players position's cell
 		if (nextCoords.x == transCoords.x && nextCoords.z == transCoords.z && 
 		    (transCoords.x != endCoords.x || transCoords.z != endCoords.z)) {
 			hitNextNode = true;
 		}
 		n = null;
-		if (hitNextNode && tempPositions.Count > 0){
-			n = tempPositions[0];
+		if (hitNextNode && path.Count > 0){
+			n = path[0];
 			next = n.loc;
-			tempPositions.RemoveAt (0);
-			//dictPath.Remove(n);
+			path.RemoveAt (0);
 			hitNextNode = false;
 		}
-//		Debug.Log("t + " + transform.position + "n + " + next);
+		Debug.DrawLine (transform.position, next, Color.red);
 		return next;
 	}
 
-	public void assignedPath(List<Node> path){//, Dictionary<Node, Node> d){
-		tempPositions = path;
-//		if (path.Count == 0) {
-//			Debug.Log ("path.count == 0, in reachGoal");
-//			Debug.Break();
-//		}
+	//scheduler gives current player a new path, so set the next node accordingly
+	public void assignedPath(List<Node> p){
+		path = p;
 		hitNextNode = false;
-		if(tempPositions.Count > 0)
-			next = tempPositions [0].loc;
-		//dictPath = d;
+		if(path.Count > 0)
+			next = path [0].loc;
 	}
 
 	public void assignGridCoords(Vector3 nxtCrds, Vector3 trnsCrds, Vector3 endCrds){

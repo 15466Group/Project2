@@ -14,7 +14,11 @@ public class Graph : Object {
 	public State oldState;
 	public Node charNode;
 
-	public Graph(Grid G){
+	public Graph(float w){
+		weight = w;
+	}
+
+	public void setGrid(Grid G){
 		g = G;
 		nodes = G.grid;
 		weight = 2.0f;
@@ -22,40 +26,7 @@ public class Graph : Object {
 		numCols = nodes.GetLength (1);
 	}
 
-//	public State setState(State S){
-
-//		useOld = false;
-//		seenEnd = false;
-//		Vector3 startCoords = g.getGridCoords (s.startNo);
-//		Vector3 endCoords = g.getGridCoords (S.end);
-//		int startI = (int)startCoords.x;
-//		int startJ = (int)startCoords.z;
-//		int endI = (int)endCoords.x;
-//		int endJ = (int)endCoords.z;
-//		Node startNode = nodes [startI, startJ];
-//		Node endNode = nodes [endI, endJ];
-//
-//		List<Node> path;
-
-//		return getPath (S);
-//		if (useOld){
-//		return getPath (S.open, S.closed, S.dictPath, startNode, endNode, S.swampCost);
-//		} else {
-//			List<Node> open = new List<Node> ();
-//			List<Node> closed = new List<Node> ();
-//			Dictionary<Node, Node> dictPath = new Dictionary<Node, Node> ();
-//			startNode.g = 0;
-//			startNode.f = startNode.g + weight * startNode.h;
-//			open.Add (startNode);
-//			path = getPath (open, closed, dictPath, startNode, endNode, swampCost);
-//		}
-
-		//set old stuff
-		//check if next frame needs to use old
-//		return path;
-//	}
-
-	//make sure the goalNode is not red. if it is, s.ongoing = false
+	//want to reuse old searches if they have not seen the endNode after short circuiting the search
 	public State getPath(State s) {
 
 		totalNodesToSearch = 100;
@@ -76,7 +47,7 @@ public class Graph : Object {
 				s.closed = new List<Node> ();
 				s.startNode = null;
 				s.endNode = null;
-				s.sGrid = null;
+//				s.sGrid = null;
 				s.ongoing = false;
 				s.dictPath = new Dictionary<Node, Node> ();
 				s.hasFullPath = true;
@@ -86,24 +57,29 @@ public class Graph : Object {
 				estimEndNode = current;
 			}
 			if (numNodesSeen >= totalNodesToSearch){
-				s.ongoing = true;
-				if (!s.hasFullPath)
-					s.path = makePath(s.dictPath, estimEndNode);
-//				s.path = makePath (s.dictPath, estimEndNode);
-//				s.open = new List<Node> ();
-//				s.closed = new List<Node> ();
-//				s.startNode = null;
-//				s.endNode = null;
-//				s.sGrid = null;
-//				s.ongoing = false;
-//				s.dictPath = new Dictionary<Node, Node> ();
-//				s.hasFullPath = true;
+				//do not keep using this search because endNode is not free
+				if (!s.endNode.free){
+					s.path = makePath (s.dictPath, estimEndNode);
+					s.open = new List<Node> ();
+					s.closed = new List<Node> ();
+					s.startNode = null;
+					s.endNode = null;
+//					s.sGrid = null;
+					s.ongoing = false;
+					s.dictPath = new Dictionary<Node, Node> ();
+				} 
+				else {
+					s.ongoing = true;
+					//only use estimated path if the current character's old state
+					//does not already have a full path to the endNode
+					if (!s.hasFullPath)
+						s.path = makePath(s.dictPath, estimEndNode);
+				}
 				return s;
 			}
 			s.open.Remove (current);
 			s.closed.Add (current);
 			foreach (Node successor in getNeighbors(current)){
-//				if (successor == 
 				Debug.DrawLine (successor.loc, current.loc, Color.blue);
 				if (s.closed.Contains (successor)){
 					continue; //in the closed set
@@ -126,6 +102,7 @@ public class Graph : Object {
 				}
 			}
 		}
+		//This should never happen
 		Debug.Log ("got here");
 		return s;
 	}
@@ -134,11 +111,11 @@ public class Graph : Object {
 		List<Node> path = new List<Node> ();
 		Node currentNode = endNode;
 		path.Add (currentNode);
-//		Node prevNode = endNode;
 		while (dictPath.ContainsKey(currentNode)) {
+			//dont need to keep reconstructing if the currentNode is close
+			//enough to the character
 			if (!withinDistance(currentNode, charNode)){
 				currentNode = dictPath[currentNode];
-	//			prevNode = currentNode;
 				path.Add(currentNode);
 			}
 			else {
@@ -151,27 +128,11 @@ public class Graph : Object {
 			n = path[0];
 			path.RemoveAt (0);
 		} 
-//		if (path.Count > 0) {
-//			n = path[0];
-//			path.RemoveAt (0);
-//		} 
-//		if (path.Count > 0) {
-//			n = path[0];
-//			path.RemoveAt (0);
-//		} 
-//		if (path.Count == 0) {
-//			Debug.Log ("path.Count == 0, in Graph, n.h = " + n.h);
-//			Debug.Break();
-//		}
-//		if (path.Count > 0) {
-//			path.RemoveAt (0);
-//		}
 		return path;
 	}
 
 	Node findSmallestVal(List<Node> open){
 		Node smallestVal = open[0];
-		//float min = smallestVal.g + weight * smallestVal.h;
 		float min = smallestVal.f;
 		foreach (Node n in open) {
 			float potentialMin = n.f;
@@ -183,11 +144,9 @@ public class Graph : Object {
 		return smallestVal;
 	}
 
-	//simple movements only
+	//swamp is for preferred path, some players may prefer swamps
 	float costOfStep(Node currNode, Node nextNode, float swampCost){
 		float cost = Vector3.Distance (currNode.loc, nextNode.loc);
-//		if ((currNode.isSwamp && !nextNode.isSwamp) ||
-//		    (!currNode.isSwamp && nextNode.isSwamp)){
 		if (currNode.isSwamp || nextNode.isSwamp){
 			cost *= swampCost;
 		}
@@ -213,8 +172,7 @@ public class Graph : Object {
 				(i != newi || j != newj) &&
 				nodes [newi, newj].free);
 	}
-
-
+	
 	float estimateHeuristic (Node n, Vector3 end) {
 		return Vector3.Distance (n.loc, end);
 	}
