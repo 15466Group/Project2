@@ -66,26 +66,30 @@ public class Scheduler : MonoBehaviour {
 		if (!s.ongoing) {
 			graph.g.updateGrid();
 			Vector3 startCoords = graph.g.getGridCoords (currChar.position);
-			Vector3 endCoords = graph.g.getGridCoords (goal.transform.position);
 			int startI = (int)startCoords.x;
 			int startJ = (int)startCoords.z;
-			int endI = (int)endCoords.x;
-			int endJ = (int)endCoords.z;
 			s.startNode = graph.g.grid [startI, startJ];
 			s.startNode.g = 0.0f;
 			s.startNode.f = s.startNode.g + graph.weight * s.startNode.h;
 			s.open.Add (s.startNode);
-			s.endNode = graph.g.grid [endI, endJ];
 			s.sGrid = graph.g;
 //			s.hasFullPath = true;
 		}
+		Vector3 endCoords = graph.g.getGridCoords (goal.transform.position);
+		int endI = (int)endCoords.x;
+		int endJ = (int)endCoords.z;
+		s.endNode = graph.g.grid [endI, endJ];
+		Vector3 charCoords = graph.g.getGridCoords (currChar.position);
+		int charI = (int)charCoords.x;
+		int charJ = (int)charCoords.z;
+		graph.setCharNode (graph.g.grid [charI, charJ]);
 
 		states[iChar] = graph.getPath (s);
 		List<Node> path = states[iChar].path;
-		if (states [iChar].path.Count == 0) {
-			Debug.Log ("states[iChar].path == 0, in scheduler");
-			Debug.Break ();
-		}
+//		if (states [iChar].path.Count == 0) {
+//			Debug.Log ("states[iChar].path == 0, in scheduler");
+//			Debug.Break ();
+//		}
 //		Debug.Log (path);
 //		prevPaths [iChar] = path;
 		reachGoal.assignedPath (path);
@@ -99,19 +103,23 @@ public class Scheduler : MonoBehaviour {
 			                            graph.g.getGridCoords(goal.transform.position));
 
 			Node r = reachGoal.nextStep ();
-//			if(r != null) {
+			if(r != null) {
 //				bool a = states[i].path.Remove(r);
 //				if (states[i].dictPath.Count > 0)
-//				foreach(Node key in states[i].dictPath.Keys) {
-//					if(states[i].dictPath[key] == r) {
-//						states[i].dictPath.Remove (key);
-//						break;
-//					}
-//				}
+				foreach(Node key in states[i].dictPath.Keys) {
+					if(Node.Equals(states[i].dictPath[key], r)) {
+						states[i].dictPath.Remove (key);
+						Debug.Log ("removed the key from dictPath");
+//						Debug.Break ();
+						break;
+					}
+				}
+				s.open.Remove(r);
+				s.closed.Add(r);
 //				states[i].dictPath.Remove (r);
 //				Debug.Log (a);
 //				prevPaths[i].Remove (r);
-//			}
+			}
 
 		}
 //		reachGoal.assignGridCoords (graph.g.getGridCoords(reachGoal.next), 

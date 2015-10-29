@@ -4,6 +4,7 @@ using System.Collections;
 public class ObstacleMovement : MonoBehaviour {
 
 	public string direction;
+	public float back;
 	private float movementTime;
 	private float howLong;
 	private int frameCount;
@@ -21,16 +22,16 @@ public class ObstacleMovement : MonoBehaviour {
 			movementTime += Time.deltaTime;
 			if (movementTime <= howLong) {
 				if (string.Compare (direction, "X") == 0) {
-					transform.position += transform.right * 0.5f;
+					transform.position += transform.right * 0.5f * back;
 				} else {
-					transform.position += transform.forward * 0.5f;
+					transform.position += transform.forward * 0.5f * back;
 				}
 			} else {
 				if (movementTime <= 2 * howLong) {
 					if (string.Compare (direction, "X") == 0) {
-						transform.position -= transform.right * 0.5f;
+						transform.position -= transform.right * 0.5f * back;
 					} else {
-						transform.position -= transform.forward * 0.5f;
+						transform.position -= transform.forward * 0.5f * back;
 					}
 				} else {
 					movementTime = 0.0f;

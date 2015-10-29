@@ -11,8 +11,8 @@ public class Graph : Object {
 	public float weight;
 	private int totalNodesToSearch;
 	private int numNodesSeen;
-	public bool useOld;
 	public State oldState;
+	public Node charNode;
 
 	public Graph(Grid G){
 		g = G;
@@ -20,7 +20,6 @@ public class Graph : Object {
 		weight = 2.0f;
 		numRows = nodes.GetLength (0);
 		numCols = nodes.GetLength (1);
-		useOld = false;
 	}
 
 //	public State setState(State S){
@@ -104,6 +103,7 @@ public class Graph : Object {
 			s.open.Remove (current);
 			s.closed.Add (current);
 			foreach (Node successor in getNeighbors(current)){
+//				if (successor == 
 				Debug.DrawLine (successor.loc, current.loc, Color.blue);
 				if (s.closed.Contains (successor)){
 					continue; //in the closed set
@@ -136,18 +136,33 @@ public class Graph : Object {
 		path.Add (currentNode);
 //		Node prevNode = endNode;
 		while (dictPath.ContainsKey(currentNode)) {
-			currentNode = dictPath[currentNode];
-//			prevNode = currentNode;
-			path.Add(currentNode);
+			if (!withinDistance(currentNode, charNode)){
+				currentNode = dictPath[currentNode];
+	//			prevNode = currentNode;
+				path.Add(currentNode);
+			}
+			else {
+				break;
+			}
 		}
 		path.Reverse ();
+		Node n = null;
 		if (path.Count > 0) {
+			n = path[0];
 			path.RemoveAt (0);
 		} 
-		if (path.Count == 0) {
-			Debug.Log ("path.Count == 0, in Graph");
-			Debug.Break();
-		}
+//		if (path.Count > 0) {
+//			n = path[0];
+//			path.RemoveAt (0);
+//		} 
+//		if (path.Count > 0) {
+//			n = path[0];
+//			path.RemoveAt (0);
+//		} 
+//		if (path.Count == 0) {
+//			Debug.Log ("path.Count == 0, in Graph, n.h = " + n.h);
+//			Debug.Break();
+//		}
 //		if (path.Count > 0) {
 //			path.RemoveAt (0);
 //		}
@@ -202,5 +217,14 @@ public class Graph : Object {
 
 	float estimateHeuristic (Node n, Vector3 end) {
 		return Vector3.Distance (n.loc, end);
+	}
+
+	public void setCharNode(Node c){
+		charNode = c;
+	}
+
+	bool withinDistance(Node n, Node m){
+		float distance = g.nodeSize * 2;
+		return (Vector3.Distance (n.loc, m.loc) <= distance);
 	}
 }
