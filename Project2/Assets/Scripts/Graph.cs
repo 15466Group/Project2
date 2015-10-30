@@ -12,7 +12,7 @@ public class Graph : Object {
 	private int totalNodesToSearch;
 	private int numNodesSeen;
 	public State oldState;
-	public Node charNode;
+	private Node charNode;
 
 	public Graph(float w){
 		weight = w;
@@ -29,7 +29,25 @@ public class Graph : Object {
 	//want to reuse old searches if they have not seen the endNode after short circuiting the search
 	public State getPath(State s) {
 
-		totalNodesToSearch = 100;
+//		totalNodesToSearch = 100;
+		int dictlen = s.dictPath.Count;
+		totalNodesToSearch = (int)((-1.0f / 10.0f) * (float)dictlen + 100.0f);
+		totalNodesToSearch = Mathf.Max (20, totalNodesToSearch);
+		Debug.Log (totalNodesToSearch + ", " + dictlen);
+
+		//search taking too long, reset
+//		if (dictlen > 1000) {
+//			Debug.Log ("OVER 9000");
+//			s.open = new List<Node> ();
+//			s.closed = new List<Node> ();
+//			s.ongoing = false;
+//			s.dictPath = new Dictionary<Node, Node> ();
+//			s.startNode = charNode;
+//			s.startNode.g = 0.0f;
+//			s.startNode.f = s.startNode.g + weight * s.startNode.h;
+//			s.open.Add (s.startNode);
+//			s.hasFullPath = true;
+//		}
 		numNodesSeen = 0;
 
 		//infinite heuristic
@@ -47,7 +65,6 @@ public class Graph : Object {
 				s.closed = new List<Node> ();
 				s.startNode = null;
 				s.endNode = null;
-//				s.sGrid = null;
 				s.ongoing = false;
 				s.dictPath = new Dictionary<Node, Node> ();
 				s.hasFullPath = true;
@@ -102,8 +119,16 @@ public class Graph : Object {
 				}
 			}
 		}
-		//This should never happen
-		Debug.Log ("got here");
+		//This should never happen . . . unless you use wallhax
+		s.path = new List<Node>();
+		s.path.Add (s.endNode);
+		s.open = new List<Node> ();
+		s.closed = new List<Node> ();
+		s.startNode = null;
+		s.endNode = null;
+		s.ongoing = false;
+		s.dictPath = new Dictionary<Node, Node> ();
+		s.hasFullPath = false;
 		return s;
 	}
 
@@ -114,6 +139,8 @@ public class Graph : Object {
 		while (dictPath.ContainsKey(currentNode)) {
 			//dont need to keep reconstructing if the currentNode is close
 			//enough to the character
+//			currentNode = dictPath[currentNode];
+//			path.Add(currentNode);
 			if (!withinDistance(currentNode, charNode)){
 				currentNode = dictPath[currentNode];
 				path.Add(currentNode);
@@ -182,7 +209,7 @@ public class Graph : Object {
 	}
 
 	bool withinDistance(Node n, Node m){
-		float distance = g.nodeSize * 2;
+		float distance = g.nodeSize * 2.5f;
 		return (Vector3.Distance (n.loc, m.loc) <= distance);
 	}
 }

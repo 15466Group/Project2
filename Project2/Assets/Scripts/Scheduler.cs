@@ -58,8 +58,8 @@ public class Scheduler : MonoBehaviour {
 		//otherwise, ongoing is set to false, and continue searching as everything is initalized
 		State s = states [iChar];
 		graph.setGrid(s.sGrid);
+		s.sGrid.updateGrid();
 		if (!s.ongoing) {
-			s.sGrid.updateGrid();
 			Vector3 startCoords = s.sGrid.getGridCoords(currChar.position);
 			int startI = (int)startCoords.x;
 			int startJ = (int)startCoords.z;
@@ -67,7 +67,6 @@ public class Scheduler : MonoBehaviour {
 			s.startNode.g = 0.0f;
 			s.startNode.f = s.startNode.g + graph.weight * s.startNode.h;
 			s.open.Add (s.startNode);
-//			s.sGrid = graph.g;
 		}
 		Vector3 endCoords = s.sGrid.getGridCoords (goal.transform.position);
 		int endI = (int)endCoords.x;
@@ -103,8 +102,6 @@ public class Scheduler : MonoBehaviour {
 						break;
 					}
 				}
-//				states[i].open.Remove(r);
-//				states[i].closed.Add(r);
 			}
 			 
 		}
