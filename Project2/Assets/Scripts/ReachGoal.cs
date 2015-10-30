@@ -5,9 +5,6 @@ using System.Collections.Generic;
 public class ReachGoal: NPCBehaviour {
 
 	public GameObject goal;
-	private Vector3 endTarget;
-	private float timer;
-	private float searchTime;
 	private bool hitNextNode;
 
 	public List<Node> path;
@@ -25,7 +22,6 @@ public class ReachGoal: NPCBehaviour {
 	public override void Start () {
 		base.Start ();
 		dynamicLayer = 1 << LayerMask.NameToLayer ("Dynamic");
-		endTarget = goal.transform.position;
 		acceleration = base.calculateAcceleration (target);
 		isWanderer = false;
 		isReachingGoal = true;
@@ -43,7 +39,6 @@ public class ReachGoal: NPCBehaviour {
 		for(int i = 0; i < path.Count - 1; i++) {
 			Debug.DrawLine (path[i].loc, path[i+1].loc, Color.yellow);
 		}
-		endTarget = goal.transform.position;
 		target = nextTarget();
 		checkArrival ();
 		base.Update ();

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Grid : MonoBehaviour {
+public class Grid {
 
 	public float nodeSize;
 	private GameObject goal;
@@ -74,12 +74,6 @@ public class Grid : MonoBehaviour {
 					}
 					grid[i,j] = new Node(free, nodeCenter, isGoal, i, j, h, isSwamp);
 				}
-			}
-		}
-		if (swamps != null) {
-			int swampCount = swamps.transform.childCount;
-			for (int k = 0; k < swampCount; k++) {
-				swamps.transform.GetChild (k).GetComponent<MeshCollider> ().enabled = false;
 			}
 		}
 	}

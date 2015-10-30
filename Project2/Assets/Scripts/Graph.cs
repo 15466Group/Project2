@@ -29,25 +29,11 @@ public class Graph : Object {
 	//want to reuse old searches if they have not seen the endNode after short circuiting the search
 	public State getPath(State s) {
 
-//		totalNodesToSearch = 100;
+		//search less nodes as the dictpath gets large, initially search 100 nodes at a time
 		int dictlen = s.dictPath.Count;
 		totalNodesToSearch = (int)((-1.0f / 10.0f) * (float)dictlen + 100.0f);
 		totalNodesToSearch = Mathf.Max (20, totalNodesToSearch);
-		Debug.Log (totalNodesToSearch + ", " + dictlen);
 
-		//search taking too long, reset
-//		if (dictlen > 1000) {
-//			Debug.Log ("OVER 9000");
-//			s.open = new List<Node> ();
-//			s.closed = new List<Node> ();
-//			s.ongoing = false;
-//			s.dictPath = new Dictionary<Node, Node> ();
-//			s.startNode = charNode;
-//			s.startNode.g = 0.0f;
-//			s.startNode.f = s.startNode.g + weight * s.startNode.h;
-//			s.open.Add (s.startNode);
-//			s.hasFullPath = true;
-//		}
 		numNodesSeen = 0;
 
 		//infinite heuristic

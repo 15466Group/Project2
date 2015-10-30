@@ -24,10 +24,6 @@ public class Scheduler : MonoBehaviour {
 	void Start () {
 		iChar = 0;
 		numChars = characters.transform.childCount;
-		Debug.Log ("numChars: " + numChars);
-
-//		G = GetComponent<Grid> ();
-//		G.initStart ();
 		graph = new Graph (2.0f);
 		states = new State[numChars];
 		for (int i = 0; i < numChars; i++) {
@@ -38,6 +34,12 @@ public class Scheduler : MonoBehaviour {
 			G.initStart();
 			states[i] = new State(new List<Node> (), new List<Node> (), new Dictionary<Node, Node> (),
 			                      null, null, reachGoal.swampCost, G, null, false, false);
+		}
+		if (swamps != null) {
+			int swampCount = swamps.transform.childCount;
+			for (int k = 0; k < swampCount; k++) {
+				swamps.transform.GetChild (k).GetComponent<MeshCollider> ().enabled = false;
+			}
 		}
 	}
 	
